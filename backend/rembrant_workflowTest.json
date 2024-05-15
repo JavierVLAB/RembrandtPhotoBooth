@@ -1,0 +1,245 @@
+{
+  "5": {
+    "inputs": {
+      "model": [
+        "6",
+        0
+      ],
+      "clip": [
+        "6",
+        1
+      ],
+      "vae": [
+        "6",
+        2
+      ]
+    },
+    "class_type": "diffusers_model_loader",
+    "_meta": {
+      "title": "Diffusers Model Loader"
+    }
+  },
+  "6": {
+    "inputs": {
+      "ckpt_name": "photon_v1.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "8": {
+    "inputs": {
+      "pixels": [
+        "28",
+        0
+      ],
+      "vae": [
+        "6",
+        2
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE Encode"
+    }
+  },
+  "9": {
+    "inputs": {
+      "image": "test01.jpg",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Load Image"
+    }
+  },
+  "22": {
+    "inputs": {
+      "model_path": "IC-Light/iclight_sd15_fc.safetensors",
+      "diffusersmodel": [
+        "5",
+        0
+      ]
+    },
+    "class_type": "LoadICLightUnetDiffusers",
+    "_meta": {
+      "title": "LoadICLightUnetDiffusers"
+    }
+  },
+  "25": {
+    "inputs": {
+      "pixels": [
+        "30",
+        0
+      ],
+      "vae": [
+        "6",
+        2
+      ]
+    },
+    "class_type": "VAEEncode",
+    "_meta": {
+      "title": "VAE Encode"
+    }
+  },
+  "28": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "interpolation": "nearest",
+      "keep_proportion": false,
+      "condition": "downscale if bigger",
+      "multiple_of": 8,
+      "image": [
+        "9",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "🔧 Image Resize"
+    }
+  },
+  "29": {
+    "inputs": {
+      "shape": "circle",
+      "frames": 1,
+      "location_x": 128,
+      "location_y": 256,
+      "grow": 30,
+      "frame_width": [
+        "28",
+        1
+      ],
+      "frame_height": [
+        "28",
+        2
+      ],
+      "shape_width": 128,
+      "shape_height": 128
+    },
+    "class_type": "CreateShapeMask",
+    "_meta": {
+      "title": "Create Shape Mask"
+    }
+  },
+  "30": {
+    "inputs": {
+      "mask": [
+        "32",
+        0
+      ]
+    },
+    "class_type": "MaskToImage",
+    "_meta": {
+      "title": "Convert Mask to Image"
+    }
+  },
+  "32": {
+    "inputs": {
+      "min": 0,
+      "max": 0.9,
+      "mask": [
+        "34",
+        0
+      ]
+    },
+    "class_type": "RemapMaskRange",
+    "_meta": {
+      "title": "Remap Mask Range"
+    }
+  },
+  "33": {
+    "inputs": {
+      "images": [
+        "30",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "34": {
+    "inputs": {
+      "expand": 20,
+      "incremental_expandrate": 1,
+      "tapered_corners": true,
+      "flip_input": false,
+      "blur_radius": 100,
+      "lerp_alpha": 1,
+      "decay_factor": 1,
+      "fill_holes": true,
+      "mask": [
+        "29",
+        0
+      ]
+    },
+    "class_type": "GrowMaskWithBlur",
+    "_meta": {
+      "title": "Grow Mask With Blur"
+    }
+  },
+  "35": {
+    "inputs": {
+      "width": 512,
+      "height": 512,
+      "steps": 25,
+      "guidance_scale": 1.01,
+      "denoise_strength": 0.9,
+      "seed": 1,
+      "scheduler": "DPMSolverMultistepScheduler_SDE_karras",
+      "prompt": "rembrandt light",
+      "n_prompt": "negative",
+      "hidiffusion": false,
+      "fixed_seed": true,
+      "diffusers_model": [
+        "22",
+        0
+      ],
+      "latent": [
+        "8",
+        0
+      ],
+      "bg_latent": [
+        "25",
+        0
+      ]
+    },
+    "class_type": "iclight_diffusers_sampler",
+    "_meta": {
+      "title": "IC-Light Diffusers Sampler"
+    }
+  },
+  "36": {
+    "inputs": {
+      "samples": [
+        "35",
+        0
+      ],
+      "vae": [
+        "6",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "37": {
+    "inputs": {
+      "filename_prefix": "myText",
+      "images": [
+        "36",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  }
+}

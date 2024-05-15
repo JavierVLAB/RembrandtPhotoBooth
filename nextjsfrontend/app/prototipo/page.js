@@ -8,6 +8,8 @@ export default function Home() {
     const [imgSrc, setImageSrc] = useState(staticImageSrc);
     const websocketRef = useRef(null);
     const [isDetectingFace, setIsDetectingFace] = useState(false)
+    const [showQRcode, setShowQRcode] = useState(false)
+    const [imageURL, setImageURL] = useState("")
 
     useEffect(() => {
         
@@ -21,15 +23,25 @@ export default function Home() {
             const message = event.data
 
             if (message === 'No people detected') {
+                
                 setImageSrc(staticImageSrc);
                 setIsDetectingFace(false)
+                setShowQRcode(false)
+
+            } else if (message.startsWith('image')) {
+              
+              const image_url = message.slice(10) 
+              console.log(image_url)
+              setImageURL(image_url)
+              setShowQRcode(true)
 
             } else {
 
                 const src = `data:image/jpeg;base64,${message}`;
                 setImageSrc(src);
                 setIsDetectingFace(true)
-            }
+                setShowQRcode(false)
+            } 
         };
 
         websocket.onerror = (error) => {
@@ -60,14 +72,19 @@ export default function Home() {
         <img src={imgSrc} alt="Webcam Stream" 
               style={isDetectingFace ? { width: "50%"} : { width: "40%"} } />
 
-        <div className="p-6 bg-white rounded-xl fixed left-50 bottom-10">
-          <QRCode
-              size={200}
-              style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-              value={"https://storage.googleapis.com/testapi-4ea72.appspot.com/imagenes/imagetest02.jpg"}
-              viewBox={`0 0 200 200`}
-              />
-        </div>
+        
+        
+        { showQRcode ?
+          <div className="p-6 bg-white rounded-xl fixed left-50 bottom-10">
+            <QRCode
+                size={200}
+                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                value={imageURL}
+                viewBox={`0 0 200 200`}
+                /> 
+          </div> : <></>
+        }
+         
       </main>
     </div>
   );

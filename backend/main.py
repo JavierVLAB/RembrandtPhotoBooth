@@ -6,6 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLO
 import numpy as np
 import time
+from comfyui_utilities import generate_image
+from upload_image_FS import upload_image_to_firebase
+from datetime import datetime
 
 debug = True
 
@@ -65,8 +68,8 @@ async def websocket_endpoint(websocket: WebSocket):
             ret, frame = camera.read()   
 
             # mirror  
-            #frame = cv2.flip(frame, 1)
-            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
+            frame = cv2.flip(frame, 1)
+            #frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
             if ret:
                 results = model(frame, verbose=False)
@@ -120,13 +123,37 @@ async def websocket_endpoint(websocket: WebSocket):
                     #img = prepare_image(frame)
                     img = frame
 
+                    jpg_as_text = None
+
                     if take_picture:
+
+                        time_now = datetime.now()
+                        formatted_date = time_now.strftime('%Y%m%d%H%M%S')
+
+                        cv2.imwrite('images/img{}.jpg'.format(formatted_date), frame)
                         
+                        time.sleep(0.1)
+
+                        jpg_as_text = generate_image('img{}'.format(formatted_date))["37"][0]         #37 is the node save image in the comfyui workflow
+
+                        image_base64 = base64.b64encode(jpg_as_text).decode('utf-8')
+
+                        time.sleep(0.1)
+                        
+                        image_out_url = upload_image_to_firebase('images_out/img{}out_00001_.png'.format(formatted_date),'imagenes/img{}_out.jpg'.format(formatted_date))
+
                         take_picture = False
 
+                        await websocket.send_text(image_base64)
+                        await asyncio.sleep(0.1) 
+
+                        await websocket.send_text("image_url:{}".format(image_out_url))
+                        await asyncio.sleep(15)
+                    
                     _, buffer = cv2.imencode('.jpg', img)
                     
                     jpg_as_text = base64.b64encode(buffer).decode()
+                    
                     await websocket.send_text(jpg_as_text)
                     
                     await asyncio.sleep(0.05) 

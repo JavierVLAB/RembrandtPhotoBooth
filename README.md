@@ -27,6 +27,7 @@ Installation on mac or linux
 - Install Was Node (in ComfyUI Manager)
 - Install missing nodes (in ComfyUI Manager)
 - Install Models IC-light (in ComfyUI Manager)
+- Remeber enable the dev mode for save the workflow api
 
 # Execution
 
@@ -45,14 +46,14 @@ Installation on mac or linux
 ``` 
 
 
-
 ## ComfyUI
-
 
 ```
 cd /ComfyUI/ComfyUI
-python3.11 main.py
+python3.11 main.py --input-directory /Users/javi/Documents/workspace/ThyssenIED/RembrandtPhotoBooth/backend/images/ --output-directory /Users/javi/Documents/workspace/ThyssenIED/RembrandtPhotoBooth/backend/images_out
 ```
+
+Run ComfyUi indicating the image input dir and the image output dir
 
 # Usage
 

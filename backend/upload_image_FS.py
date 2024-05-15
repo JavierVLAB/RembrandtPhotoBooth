@@ -8,7 +8,7 @@ firebase_admin.initialize_app(cred, {
 })
 
 
-def upload_image(file_path, destination_blob_name):
+def upload_image_to_firebase(file_path, destination_blob_name):
     """Sube una imagen a Firebase Storage y retorna la URL pública"""
     bucket = storage.bucket()
     blob = bucket.blob(destination_blob_name)
@@ -22,10 +22,9 @@ def upload_image(file_path, destination_blob_name):
     # Retorna la URL pública
     return blob.public_url
 
-# Ejemplo de uso
 if __name__ == "__main__":
-    file_path = 'images/testJavi01.jpg'  # Cambia esto por la ruta de tu imagen
-    destination_blob_name = 'imagenes/imagetest02.jpg'  # Cambia esto por el nombre que quieres darle a tu imagen en el storage
+    file_path = 'images/testJavi01.jpg'  #local image
+    destination_blob_name = 'imagenes/imagetest03.jpg'  #image path in the cloud storage
     
-    public_url = upload_image(file_path, destination_blob_name)
+    public_url = upload_image_to_firebase(file_path, destination_blob_name)
     print(f"Archivo subido a {public_url}")
