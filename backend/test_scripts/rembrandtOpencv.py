@@ -10,9 +10,9 @@ def adjust_gamma(image, gamma=1.0):
 	# apply gamma correction using the lookup table
 	return cv2.LUT(image, table)
 
-def apply_rembrandt_effect(image_path):
+def apply_rembrandt_effect(img):
     # Cargar imagen
-    img = cv2.imread(image_path)
+    
     
     if img is None:
         print("Error: no se pudo cargar la imagen.")
@@ -41,15 +41,16 @@ def apply_rembrandt_effect(image_path):
 
     rembrandt = np.uint8(img2 * vignette * 3)
 
+    return rembrandt
     #rembrandt = np.uint8(img * vignette )
 
-    # # Mostrar la imagen original y la modificada
-    cv2.imshow('Original', img)
-    cv2.imshow('Original2', img2)
-    cv2.imshow('Rembrandt Style', rembrandt)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # # Mostrar la imagen original y la modificada
+    # cv2.imshow('Original', img)
+    # cv2.imshow('Original2', img2)
+    # cv2.imshow('Rembrandt Style', rembrandt)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 
 # Cambia 'path_to_your_image.jpg' al path de tu imagen
-apply_rembrandt_effect('images/testJavi01.jpg')
+#apply_rembrandt_effect('images/testJavi01.jpg')
 

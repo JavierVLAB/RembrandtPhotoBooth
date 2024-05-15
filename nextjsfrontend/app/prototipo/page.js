@@ -1,11 +1,13 @@
 "use client"
 import Head from 'next/head';
 import { useEffect, useRef, useState } from 'react';
+import QRCode from "react-qr-code";
 
 export default function Home() {
     const staticImageSrc = '/Rembrandt.jpg';
     const [imgSrc, setImageSrc] = useState(staticImageSrc);
     const websocketRef = useRef(null);
+    const [isDetectingFace, setIsDetectingFace] = useState(false)
 
     useEffect(() => {
         
@@ -20,11 +22,13 @@ export default function Home() {
 
             if (message === 'No people detected') {
                 setImageSrc(staticImageSrc);
+                setIsDetectingFace(false)
 
             } else {
 
                 const src = `data:image/jpeg;base64,${message}`;
                 setImageSrc(src);
+                setIsDetectingFace(true)
             }
         };
 
@@ -53,11 +57,16 @@ export default function Home() {
       </Head>
 
       <main className="flex flex-1 flex-col items-center justify-center">
-      <img src={imgSrc} alt="Webcam Stream" 
-            style={{ width: "400", height: "600" }} />
-      <div className="mt-5">
-          <button className="mx-2 px-4 py-2 text-lg cursor-pointer">Boton 1</button>
-          <button className="mx-2 px-4 py-2 text-lg cursor-pointer">Boton 2</button>
+        <img src={imgSrc} alt="Webcam Stream" 
+              style={isDetectingFace ? { width: "50%"} : { width: "40%"} } />
+
+        <div className="p-6 bg-white rounded-xl fixed left-50 bottom-10">
+          <QRCode
+              size={200}
+              style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+              value={"https://storage.googleapis.com/testapi-4ea72.appspot.com/imagenes/imagetest02.jpg"}
+              viewBox={`0 0 200 200`}
+              />
         </div>
       </main>
     </div>
