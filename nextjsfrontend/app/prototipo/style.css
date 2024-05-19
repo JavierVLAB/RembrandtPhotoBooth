@@ -1,0 +1,9 @@
+.background {
+    background-image: url('/peter-gargiulo-cGNCepznaV8-unsplash.jpg');
+    background-size: cover; /* Ajusta la imagen para cubrir todo el contenedor */
+    background-position: center; /* Centra la imagen */
+    background-repeat: no-repeat; /* Evita que la imagen se repita */
+    width: 100%;
+    height: 100vh; /* Hace que el contenedor tenga la altura de la ventana */
+  }
+  

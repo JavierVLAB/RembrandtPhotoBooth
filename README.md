@@ -49,12 +49,31 @@ Installation on mac or linux
 ## ComfyUI
 
 ```
-cd /ComfyUI/ComfyUI
+cd path/to/ComfyUI
 python3.11 main.py --input-directory /Users/javi/Documents/workspace/ThyssenIED/RembrandtPhotoBooth/backend/images/ --output-directory /Users/javi/Documents/workspace/ThyssenIED/RembrandtPhotoBooth/backend/images_out
 ```
+
+"cd /Users/javi/Documents/workspace/ComfyUI/ComfyUI"
 
 Run ComfyUi indicating the image input dir and the image output dir
 
 # Usage
 
 Open the APP at [http://localhost:3000/prototipo](localhost:3000/prototipo)
+
+
+# TO-DO
+
+- ~~ajustar relacion de aspecto camaras~~
+- ajustar balance de blanco
+- como poner los logos
+- ~~mejorar lo del posicionamiento de la cara~~ poner quizas texto de posicionar ojos
+- decidir si son los ojos, cara, o etc y arreglarlo
+- como hacer confirmación o simplemente
+- revisar tiempos de espera ahora: 20 segundos para QR, 3 para toma de foto, 30 para generar IA 
+- ~~mostrar avance de generacion?~~
+- ~~mostrar conteo poner conteo cuando va~~
+- ~~mostrar flash poner flash cuando va~~
+- arreglar IA
+- automatizar cambio de camaras y decidir que camara usar
+- revisar porque despues de ver la nueva imagen se pone primero la foto anterior y luego empieza de nuevo el streaming

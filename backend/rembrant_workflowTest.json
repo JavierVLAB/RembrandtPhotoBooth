@@ -191,8 +191,8 @@
       "denoise_strength": 0.9,
       "seed": 1,
       "scheduler": "DPMSolverMultistepScheduler_SDE_karras",
-      "prompt": "rembrandt light",
-      "n_prompt": "negative",
+      "prompt": "soft light, cinematic, masterpiece, best quality, photography",
+      "n_prompt": "bad quality, bad picture, dark image",
       "hidiffusion": false,
       "fixed_seed": true,
       "diffusers_model": [

@@ -38,7 +38,7 @@ def get_images(ws, prompt):
                 if data['node'] is None and data['prompt_id'] == prompt_id:
                     break #Execution is done
             elif message['type'] == 'progress':
-                print(str(message['data']['value']) + '/' + str(message['data']['value']))
+                print(str(message['data']['value']) + '/' + str(message['data']['max']))
         else:
             continue #previews are binary data
 

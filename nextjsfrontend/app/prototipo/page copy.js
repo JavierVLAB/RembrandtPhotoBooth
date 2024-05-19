@@ -1,11 +1,9 @@
 "use client"
-import Image from 'next/image';
 import Head from 'next/head';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import QRCode from "react-qr-code";
 import { Timer } from "./Timer.js"
 import { Transition } from '@headlessui/react'
-import './style.css'
 
 export default function Home() {
     const staticImageSrc = '/Rembrandt.jpg';
@@ -18,70 +16,8 @@ export default function Home() {
     const [isFlash, setIsFlash] = useState(false)
     const [progress, setProgress] = useState(0)
     const [isGeneratingAI, setIsGeneratingAI] = useState(false)
-    const [msgCount, setMsgCount] = useState(0)
-    const [showEyeArea, setShowEyeArea] = useState(false)
-
-    const time_before_foto = 3
-
-    const handleWebSocketMessages = useCallback((event) => {
-
-            const message = event.data
-
-            setMsgCount(msgCount+1)
-            
-            if (message.startsWith('text_message')){
-
-              const text_message = message.slice(13)
-              
-
-              if (text_message === 'No people detected') {
-                
-                setImageSrc(staticImageSrc);
-                setIsDetectingFace(false)
-                setShowQRcode(false)
-                setShowEyeArea(false)
-
-
-              } else if (text_message.startsWith('image')) {
-              
-                const image_url = text_message.slice(10) 
-                console.log(image_url)
-                setImageURL(image_url)
-                
-                setShowQRcode(true)
-                setIsGeneratingAI(false)
-                setShowEyeArea(false)
-              
-              } else if (text_message === 'show counter') {
-
-                setIsTimerOn(true)
-                setProgress(0)
-                setShowEyeArea(false)
-
-              } else if (text_message === 'hide counter') {
-
-                setIsTimerOn(false)
-                setShowEyeArea(true)
-
-              } else if (text_message.startsWith('progress')) {
-
-                const new_progress = Math.round(Number(text_message.slice(9))*100)
-                setIsGeneratingAI(true)
-                setProgress(new_progress)
-                setShowEyeArea(false)
-                //console.log(new_progress)
-                //setImageSrc(staticImageSrc);
-              }
-
-            } else {
-
-                const src = `data:image/jpeg;base64,${message}`;
-                setImageSrc(src);
-                setIsDetectingFace(true)
-                setShowQRcode(false)
-                setShowEyeArea(true)
-            }
-          }, [])   
+    const [iflag, setFlag] = useState(false)
+    const [randomN, setRandomN] = useState(0)
 
 
     useEffect(() => {
@@ -99,45 +35,78 @@ export default function Home() {
 
         websocket.onclose = () => {
             console.log("WebSocket connection closed.");
-        }; 
-
-        websocket.onmessage = handleWebSocketMessages
-
-    
-        return () => {
-
-          websocketRef.current.close();
         };
 
-    }, [handleWebSocketMessages]);
+        websocket.onmessage = (event) => {
+            const message = event.data
 
+            if (message.startsWith('text_message')){
+
+              const text_message = message.slice(13)
+              
+
+              if (text_message === 'No people detected') {
+                
+                setImageSrc(staticImageSrc);
+                setIsDetectingFace(false)
+                setShowQRcode(false)
+
+              } else if (text_message.startsWith('image')) {
+              
+                const image_url = message.slice(10) 
+                console.log(image_url)
+                setImageURL(image_url)
+                setShowQRcode(true)
+              
+              } else if (text_message === 'show counter') {
+
+                setIsTimerOn(true)
+
+              } else if (text_message === 'hide counter') {
+
+                setIsTimerOn(false)
+
+              } else if (text_message.startsWith('progress')) {
+
+                const new_progress = Number(text_message.slice(9))
+                setIsGeneratingAI(true)
+                setProgress(new_progress)
+                console.log(text_message.slice(9))
+              }
+
+            } else {
+
+                const src = `data:image/jpeg;base64,${message}`;
+                setImageSrc(src);
+                setIsDetectingFace(true)
+                setShowQRcode(false)
+            } 
+
+        };
+
+        
+
+
+
+        return () => {
+
+                websocketRef.current.close();
+            
+        };
+    }, []);
 
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center background">
+    <div className="flex min-h-screen flex-col items-center justify-center">
       <Head>
         <title>Dark Chamber Rembrandt</title>
       </Head>
 
       <main className="flex flex-1 flex-col items-center justify-center">
-        {/*<img src={imgSrc} alt="Webcam Stream" 
-              style={isDetectingFace ? { width: "90%"} : { width: "40%"} } />*/}
+        <img src={imgSrc} alt="Webcam Stream" 
+              style={isDetectingFace ? { width: "50%"} : { width: "40%"} } />
 
-        <div className=''>
-          <Image
-            src={imgSrc}
-            alt="Imagen recibida por websocket"
-            width={500} // Especifica el ancho deseado
-            height={800} // Especifica la altura deseada
-            style={{ objectFit: 'cover' }} // Esto asegura que la imagen se escale correctamente
-          />
-            {(showEyeArea & !isTimerOn) ? <div className="absolute inset-0 flex justify-center">
-              <div className="absolute top-1/4 bg-black bg-opacity-50 w-48 h-48 rounded-lg items-center">
-              {/*<h1 className="mb-4 text-center">Zona para ojos</h1>*/}
-              </div>
-            </div> : <></>}
-        </div>
-
+        
         
         { showQRcode ?
           <div className="p-6 bg-white rounded-xl fixed left-50 bottom-10">
@@ -151,16 +120,14 @@ export default function Home() {
         }
 
         {isTimerOn  ? 
-          <Timer secondsToWait={time_before_foto} setIsVisible={() => {
+          <Timer secondsToWait={5} setIsVisible={() => {
               setIsTimerOn(false)
               setIsFlash(true)
-              setShowEyeArea(false)
               setTimeout(() => {
                 setIsFlash(false)
               }, "200");
               setTimeout(() => {
                 setIsGeneratingAI(true)
-                
               }, "300");
 
             }}/> : <></>}
@@ -180,7 +147,7 @@ export default function Home() {
 
         {isGeneratingAI ? <div className="p-1 text-2xl font-bold w-1/2 fixed left-50 bottom-20 opacity-70">
           <h1 className="mb-4 text-center">Generando imagen {progress}%</h1>
-          <div className="flex w-full rounded-full  border-white border-2 p-1">
+          <div className="flex w-full rounded-full  border-white border-2 p-4">
             <div
               className="h-6 bg-gray-600 rounded-full dark:bg-gray-100"
               style={{ width: `${progress}%` }}
@@ -189,7 +156,6 @@ export default function Home() {
         </div> : <></>}
 
       </main>
-
     </div>
   );
 }

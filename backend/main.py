@@ -6,11 +6,24 @@ from fastapi.middleware.cors import CORSMiddleware
 from ultralytics import YOLO
 import numpy as np
 import time
-from comfyui_utilities import generate_image
+from comfyui_utilities import get_images
 from upload_image_FS import upload_image_to_firebase
 from datetime import datetime
 
-debug = True
+
+###########
+
+time_before_photo = 3 #seconds
+time_to_see_qr_code = 5 
+
+cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
+#cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
+
+debug = False
+###########
+
+
+
 
 app = FastAPI()
 
@@ -38,17 +51,22 @@ def prepare_image(image):
     #cropped_image = image[0:720,352:928]
     
     #img = cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
-    #img = cv2.resize(img, (960,1200))
+    img = cv2.resize(img, (960,1200))
     #return cropped_image
     return image
 
 def face_is_center(center, size, points):
 
-    for point in points:
-        if np.linalg.norm(center - point) > size:
-            return False
+    # for point in points:
+    #     if np.linalg.norm(center - point) > size:
+    #         return False
     
+    for point in points:
+        if point[0] > center[0] + size or point[0] < center[0] - size or point[1] > center[1] + size or point[1] < center[1] - size:  
+            return False
     return True
+
+
         
 
 # Endpoint para iniciar la detección y el streaming
@@ -67,11 +85,17 @@ async def websocket_endpoint(websocket: WebSocket):
 
             ret, frame = camera.read()   
 
-            # mirror  
-            frame = cv2.flip(frame, 1)
-            #frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
 
             if ret:
+                # mirror  
+                frame = cv2.flip(frame, 1)
+
+                #crop
+                frame = frame[ 0:1080, 523:1198] if cam['portrait'] else frame[ 0:720, 72:648]
+                
+                #rotate only the rotated camera
+                if cam["portrait"]: frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+                    
                 results = model(frame, verbose=False)
                 
                 results_data = results[0].keypoints.data.numpy().shape[1]
@@ -86,8 +110,11 @@ async def websocket_endpoint(websocket: WebSocket):
                     earL_center = results[0].keypoints.xy.numpy()[0][3]
                     earR_center = results[0].keypoints.xy.numpy()[0][4]
 
-                    center = (640, 360)
-                    size = 100
+                    #print(frame.shape)
+                    (frame_height, frame_width, _) = frame.shape
+                    
+                    center = (frame_width/2, frame_height*0.35)
+                    size = int(frame_width*0.2)
                     colors = None
 
                     # Determine if the face is inside the circle
@@ -95,20 +122,26 @@ async def websocket_endpoint(websocket: WebSocket):
                         
                         if counting_time:
                             
-                            if time.time() - start_time >= 3:
+                            if time.time() - start_time >= time_before_photo:
                                 take_picture = True
                                 counting_time = False
-
-                                
+       
                         else:
-                            
+
+                            await websocket.send_text("text_message:show counter")
                             counting_time = True
                             start_time = time.time()
-                             
+            
                         colors = (0,255,0)
                     else:
+
+                        if counting_time:
+                            await websocket.send_text("text_message:hide counter")
+
                         counting_time = False
                         colors = (0,0,255)
+
+                        
 
                     if debug:
 
@@ -118,7 +151,10 @@ async def websocket_endpoint(websocket: WebSocket):
                         cv2.circle(frame, (int(earR_center[0]),int(earR_center[1])), 3, (255,0,0) , 2)
                         cv2.circle(frame, (int(earL_center[0]),int(earL_center[1])), 3, (255,0,0) , 2)
                         
-                        cv2.circle(frame, (640,360), 100, colors , 1)
+                        cv2.circle(frame, (int(center[0]),int(center[1])), size, colors , 1)
+                        cv2.rectangle(frame, (int(center[0] - size),int(center[1] - size)), (int(center[0]+size),int(center[1]+size)), colors , 1)
+                        cv2.rectangle(frame, (0,0), (100,100), (50,50,50,50) , -1)
+
 
                     #img = prepare_image(frame)
                     img = frame
@@ -134,21 +170,21 @@ async def websocket_endpoint(websocket: WebSocket):
                         
                         time.sleep(0.1)
 
-                        jpg_as_text = generate_image('img{}'.format(formatted_date))["37"][0]         #37 is the node save image in the comfyui workflow
+                        jpg_as_text = await get_images(websocket, 'img{}'.format(formatted_date))        #37 is the node save image in the comfyui workflow
 
                         image_base64 = base64.b64encode(jpg_as_text).decode('utf-8')
 
                         time.sleep(0.1)
                         
-                        image_out_url = upload_image_to_firebase('images_out/img{}out_00001_.png'.format(formatted_date),'imagenes/img{}_out.jpg'.format(formatted_date))
+                        image_out_url = None#upload_image_to_firebase('images_out/img{}out_00001_.png'.format(formatted_date),'imagenes/img{}_out.jpg'.format(formatted_date))
 
                         take_picture = False
 
                         await websocket.send_text(image_base64)
                         await asyncio.sleep(0.1) 
 
-                        await websocket.send_text("image_url:{}".format(image_out_url))
-                        await asyncio.sleep(15)
+                        await websocket.send_text("text_message:image_url:{}".format(image_out_url))
+                        await asyncio.sleep(time_to_see_qr_code)
                     
                     _, buffer = cv2.imencode('.jpg', img)
                     
@@ -159,8 +195,8 @@ async def websocket_endpoint(websocket: WebSocket):
                     await asyncio.sleep(0.05) 
 
                 else:
-                    await websocket.send_text("No people detected")
-                    await asyncio.sleep(5) 
+                    await websocket.send_text("text_message:No people detected")
+                    await asyncio.sleep(2) 
                 
             else:
                 break

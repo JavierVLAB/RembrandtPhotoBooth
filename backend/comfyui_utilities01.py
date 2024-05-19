@@ -2,7 +2,6 @@ import websocket #NOTE: websocket-client (https://github.com/websocket-client/we
 import uuid
 import json
 from urllib import request, parse
-import asyncio
 
 server_address = "127.0.0.1:8188"
 client_id = str(uuid.uuid4())
@@ -23,18 +22,7 @@ def get_history(prompt_id):
     with request.urlopen("http://{}/history/{}".format(server_address, prompt_id)) as response:
         return json.loads(response.read())
 
-async def get_images(wsnextjs, image_name = "test01"):
-    
-    with open("rembrant_workflowTest.json", "r") as workflow_file:
-        prompt = json.loads(workflow_file.read())
-
-    prompt["9"]["inputs"]["image"] = image_name + '.jpg'
-    prompt["37"]["inputs"]["filename_prefix"] = image_name + 'out'
-    prompt["35"]["inputs"]["seed"] = 0
-
-    ws = websocket.WebSocket()
-    ws.connect("ws://{}/ws?clientId={}".format(server_address, client_id))
-
+def get_images(ws, prompt):
     prompt_id = queue_prompt(prompt)['prompt_id']
     output_images = {}
     
@@ -48,11 +36,9 @@ async def get_images(wsnextjs, image_name = "test01"):
                 if data['node'] is None and data['prompt_id'] == prompt_id:
                     break #Execution is done
             elif message['type'] == 'progress':
-                progress = str(message['data']['value']/message['data']['max'])
-                #print(progress)
-                await wsnextjs.send_text('text_message:progress:'+progress)
-                await asyncio.sleep(0.01)
-                #print(str(message['data']['value']) + '/' + str(message['data']['max']))
+                progress = message['data']['value']/message['data']['max']
+                print(progress)
+                print(str(message['data']['value']) + '/' + str(message['data']['max']))
 
 
         else:
@@ -69,7 +55,7 @@ async def get_images(wsnextjs, image_name = "test01"):
                     images_output.append(image_data)
             output_images[node_id] = images_output
 
-    return output_images["37"][0]
+    return output_images
 
 def generate_image(image_name = "test01"):
     
