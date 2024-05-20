@@ -16,8 +16,8 @@ from datetime import datetime
 time_before_photo = 3 #seconds
 time_to_see_qr_code = 5 
 
-cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
-#cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
+#cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
+cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
 
 debug = False
 ###########
@@ -81,17 +81,21 @@ async def websocket_endpoint(websocket: WebSocket):
 
     try:
         camera = cv2.VideoCapture(0) 
+        camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
+        camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+        
         while True:
 
             ret, frame = camera.read()   
 
 
             if ret:
+                print(frame.shape)
                 # mirror  
                 frame = cv2.flip(frame, 1)
 
                 #crop
-                frame = frame[ 0:1080, 523:1198] if cam['portrait'] else frame[ 0:720, 72:648]
+                frame = frame[0:1080,285:1635] if cam['portrait'] else frame[ 0:720, 72:648]
                 
                 #rotate only the rotated camera
                 if cam["portrait"]: frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)

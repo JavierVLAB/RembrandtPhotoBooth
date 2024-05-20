@@ -10,9 +10,22 @@ Installation on mac or linux
 % cd backend/
 % python3.11 -m venv venv
 % source venv/bin/activate
-(venv)% pip install "fastapi[all]"
 (venv)% pip install -r requirements.txt
 ```
+
+Installation on Windows
+
+- Using Powershell
+- Install virtualenv
+- In administrator PowerShell allow local scripts with ```Set-ExecutionPolicy RemoteSigned```
+
+```
+% cd backend/
+% virtualenv venv
+% .\venv\Scripts\activate
+(venv)% pip install -r requirements.txt
+```
+
 ## Frontend
 
 ```
@@ -28,6 +41,11 @@ Installation on mac or linux
 - Install missing nodes (in ComfyUI Manager)
 - Install Models IC-light (in ComfyUI Manager)
 - Remeber enable the dev mode for save the workflow api
+- Install insightface (https://github.com/Gourieff/comfyui-reactor-node?tab=readme-ov-file#i-for-windows-users-if-you-still-cannot-build-insightface-for-some-reasons-or-just-dont-want-to-install-visual-studio-or-vs-c-build-tools---do-the-following)
+
+download https://huggingface.co/InstantX/InstantID/tree/main/ControlNetModel diffusion_pythorch_model.safetensors
+download ip-adapter.bin comfyui
+dowload antylope2 https://github.com/deepinsight/insightface/tree/master/python-package
 
 # Execution
 

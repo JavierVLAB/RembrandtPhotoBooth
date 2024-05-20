@@ -1,3 +1,5 @@
 fastapi
 opencv-contrib-python
 ultralytics
+websocket-client
+firebase-admin
