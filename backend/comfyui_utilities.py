@@ -25,12 +25,16 @@ def get_history(prompt_id):
 
 async def get_images(wsnextjs, image_name = "test01"):
     
-    with open("rembrant_workflowTest.json", "r") as workflow_file:
+    with open("dark-room-rembrandt.json", "r") as workflow_file:
         prompt = json.loads(workflow_file.read())
 
-    prompt["9"]["inputs"]["image"] = image_name + '.jpg'
-    prompt["37"]["inputs"]["filename_prefix"] = image_name + 'out'
-    prompt["35"]["inputs"]["seed"] = 0
+    prompt["20"]["inputs"]["image"] = image_name + '.jpg'
+    prompt["26"]["inputs"]["image"] = image_name + '.jpg'
+    prompt["28"]["inputs"]["image"] = image_name + '.jpg'
+
+    prompt["53"]["inputs"]["filename_prefix"] = image_name + 'out'
+    
+    prompt["3"]["inputs"]["seed"] = 0
 
     ws = websocket.WebSocket()
     ws.connect("ws://{}/ws?clientId={}".format(server_address, client_id))
@@ -69,7 +73,7 @@ async def get_images(wsnextjs, image_name = "test01"):
                     images_output.append(image_data)
             output_images[node_id] = images_output
 
-    return output_images["37"][0]
+    return output_images["53"][0]
 
 def generate_image(image_name = "test01"):
     

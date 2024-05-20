@@ -1,4 +1,3 @@
 @echo off
-cd C:\ruta\de\tu\proyecto\nextjs
-npm install
+cd C:\Users\User\RembrandtPhotoBooth\nextjsfrontend
 npm run dev
