@@ -1,10 +1,10 @@
 import cv2
 
-def main():
+def insert_logos(background_image_path, output_image_path):
     # Rutas de las imágenes
-    background_image_path = 'imagen_1.png'
+
     overlay_image_path = 'img_2.png'
-    output_image_path = 'combined_image.png'
+
 
     # Leer las imágenes
     background_image = cv2.imread(background_image_path)
@@ -34,7 +34,7 @@ def main():
 
     # Guardar la imagen resultante
     cv2.imwrite(output_image_path, background_image)
-    print(f"Imagen guardada en {output_image_path}")
+    #print(f"Imagen guardada en {output_image_path}")
 
 if __name__ == "__main__":
-    main()
+    insert_logos('test_scripts/imagen_1.png', 'images_out/combined_image.png')

@@ -9,6 +9,7 @@ import time
 from comfyui_utilities import get_images
 from upload_image_FS import upload_image_to_firebase
 from datetime import datetime
+from insertpngopenCV import insert_logos
 
 
 ###########
@@ -19,7 +20,7 @@ time_to_see_qr_code = 5
 #cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
 cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
 
-debug = True
+debug = False
 ###########
 
 time_now = None
@@ -146,7 +147,7 @@ async def websocket_endpoint(websocket: WebSocket):
                             counting_time = True
                             start_time = time.time()
                             time_now = datetime.now()
-                            formatted_date = time_now.strftime('%Y%m%d%H%M%S')
+                            formatted_date = time_now.strftime('%m%d%H%M')
 
             
                         colors = (0,255,0)
@@ -190,11 +191,17 @@ async def websocket_endpoint(websocket: WebSocket):
 
                         time.sleep(0.1)
                         
-                        image_out_url = None#upload_image_to_firebase('images_out/img{}out_00001_.png'.format(formatted_date),'imagenes/img{}_out.jpg'.format(formatted_date))
+                        image_out_url = None #upload_image_to_firebase('images_out/img{}out_00001_.png'.format(formatted_date),'imagenes/img{}_out.jpg'.format(formatted_date))
 
                         take_picture = False
 
-                        await websocket.send_text(image_base64)
+                        insert_logos('images_out/img{}out_00001_.png'.format(formatted_date), 'images_out/img{}out.png'.format(formatted_date))
+
+                        send_img = cv2.imread('images_out/img{}out.png'.format(formatted_date))
+                        _, buffer = cv2.imencode('.jpg', send_img)
+                        jpg_as_text = base64.b64encode(buffer).decode()
+
+                        await websocket.send_text(jpg_as_text)
                         await asyncio.sleep(0.1) 
 
                         await websocket.send_text("text_message:image_url:{}".format(image_out_url))
@@ -205,7 +212,6 @@ async def websocket_endpoint(websocket: WebSocket):
                     jpg_as_text = base64.b64encode(buffer).decode()
                     
                     await websocket.send_text(jpg_as_text)
-                    
                     await asyncio.sleep(0.05) 
 
                 else:
