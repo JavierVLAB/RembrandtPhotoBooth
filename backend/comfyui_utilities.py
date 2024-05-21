@@ -75,19 +75,44 @@ async def get_images(wsnextjs, image_name = "test01"):
 
     return output_images["53"][0]
 
-def generate_image(image_name = "test01"):
+async def generate_image(wsnextjs, image_name = "test01"):
     
-    with open("rembrant_workflowTest.json", "r") as workflow_file:
+    with open("darkroom_v04.json", "r") as workflow_file:
         prompt = json.loads(workflow_file.read())
 
-    prompt["9"]["inputs"]["image"] = image_name + '.jpg'
-    prompt["37"]["inputs"]["filename_prefix"] = image_name + 'out'
-    prompt["35"]["inputs"]["seed"] = 0
+    prompt["20"]["inputs"]["image"] = image_name + '.jpg'
+    prompt["26"]["inputs"]["image"] = image_name + '.jpg'
+    prompt["28"]["inputs"]["image"] = image_name + '.jpg'
+
+    prompt["53"]["inputs"]["filename_prefix"] = image_name + 'out'
+    
+    prompt["3"]["inputs"]["seed"] = 0
 
     ws = websocket.WebSocket()
     ws.connect("ws://{}/ws?clientId={}".format(server_address, client_id))
 
-    return get_images(ws, prompt)
+    prompt_id = queue_prompt(prompt)['prompt_id']
+    output_images = {}
+    
+    while True:
+        out = ws.recv()
+
+        if isinstance(out, str):
+            message = json.loads(out)
+            if message['type'] == 'executing':
+                data = message['data']
+                if data['node'] is None and data['prompt_id'] == prompt_id:
+                    break #Execution is done
+            elif message['type'] == 'progress':
+                progress = str(message['data']['value']/message['data']['max'])
+                #print(progress)
+                await wsnextjs.send_text('text_message:progress:'+progress)
+                await asyncio.sleep(0.01)
+                #print(str(message['data']['value']) + '/' + str(message['data']['max']))
+
+
+        else:
+            continue #previews are binary data
 
 
 if __name__ == "__main__":

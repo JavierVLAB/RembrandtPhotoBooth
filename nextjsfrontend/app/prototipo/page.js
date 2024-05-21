@@ -24,90 +24,91 @@ export default function Home() {
     const time_before_foto = 3
 
     const handleWebSocketMessages = useCallback((event) => {
+      // funcion que maneja los mensajes recibidos por websocket
+      const message = event.data
 
-            const message = event.data
-
-            setMsgCount(msgCount+1)
-            
-            if (message.startsWith('text_message')){
-
-              const text_message = message.slice(13)
-              
-
-              if (text_message === 'No people detected') {
-                
-                setImageSrc(staticImageSrc);
-                setIsDetectingFace(false)
-                setShowQRcode(false)
-                setShowEyeArea(false)
+      setMsgCount(msgCount+1)
+      
+      if (message.startsWith('text_message')){
+        // Se recibe con todos los mensajes que no son una imagen
+        const text_message = message.slice(13)
+        
+        if (text_message === 'No people detected') {
+          // Cuando no se detecta a nadie
+          setImageSrc(staticImageSrc);
+          setIsDetectingFace(false)
+          setShowQRcode(false)
+          setShowEyeArea(false)
 
 
-              } else if (text_message.startsWith('image')) {
-              
-                const image_url = text_message.slice(10) 
-                console.log(image_url)
-                setImageURL(image_url)
-                
-                setShowQRcode(true)
-                setIsGeneratingAI(false)
-                setShowEyeArea(false)
-              
-              } else if (text_message === 'show counter') {
+        } else if (text_message.startsWith('image')) {
+          //cuando se recibe el nombre de la imagen para generar el qrcode
+          const image_url = text_message.slice(10) 
+          console.log(image_url)
+          setImageURL(image_url)
+          
+          setShowQRcode(true)
+          setIsGeneratingAI(false)
+          setShowEyeArea(false)
+        
+        } else if (text_message === 'show counter') {
+          // Cuando la persona esta colocada correctamente
+          //y se empieza a contar antes de la fot
+          setIsTimerOn(true)
+          setProgress(0)
+          setShowEyeArea(false)
 
-                setIsTimerOn(true)
-                setProgress(0)
-                setShowEyeArea(false)
+        } else if (text_message === 'hide counter') {
+          // cuando la persona se sale de la posicion correcta
+          setIsTimerOn(false)
+          setShowEyeArea(true)
 
-              } else if (text_message === 'hide counter') {
+        } else if (text_message.startsWith('progress')) {
+          //cuando comfyui esta generando la imagen
+          const new_progress = Math.round(Number(text_message.slice(9))*100)
+          setIsGeneratingAI(true)
+          setProgress(new_progress)
+          setShowEyeArea(false)
+          //console.log(new_progress)
+          //setImageSrc(staticImageSrc);
+        }
 
-                setIsTimerOn(false)
-                setShowEyeArea(true)
-
-              } else if (text_message.startsWith('progress')) {
-
-                const new_progress = Math.round(Number(text_message.slice(9))*100)
-                setIsGeneratingAI(true)
-                setProgress(new_progress)
-                setShowEyeArea(false)
-                //console.log(new_progress)
-                //setImageSrc(staticImageSrc);
-              }
-
-            } else {
-
-                const src = `data:image/jpeg;base64,${message}`;
-                setImageSrc(src);
-                setIsDetectingFace(true)
-                setShowQRcode(false)
-                setShowEyeArea(true)
-            }
-          }, [])   
+      } else {
+          //cuando se recibe una imagen
+          const src = `data:image/jpeg;base64,${message}`;
+          setImageSrc(src);
+          setIsDetectingFace(true)
+          setShowQRcode(false)
+          setShowEyeArea(true)
+      }
+    }, [])   
 
 
     useEffect(() => {
+      //funciones para websocket
+      const websocket = new WebSocket('ws://localhost:8000/ws');
+      websocketRef.current = websocket;
+      
+      websocket.onopen = () => {
+          console.log("WebSocket connection established.");
+      };
+
+      websocket.onerror = (error) => {
+        console.log("WebSocket error:", error);
         
-        const websocket = new WebSocket('ws://localhost:8000/ws');
-        websocketRef.current = websocket;
-        
-        websocket.onopen = () => {
-            console.log("WebSocket connection established.");
-        };
+      };
 
-        websocket.onerror = (error) => {
-          console.log("WebSocket error:", error);
-        };
+      websocket.onclose = () => {
+          console.log("WebSocket connection closed.");
+      }; 
 
-        websocket.onclose = () => {
-            console.log("WebSocket connection closed.");
-        }; 
+      websocket.onmessage = handleWebSocketMessages
 
-        websocket.onmessage = handleWebSocketMessages
 
-    
-        return () => {
+      return () => {
 
-          websocketRef.current.close();
-        };
+        websocketRef.current.close();
+      };
 
     }, [handleWebSocketMessages]);
 
@@ -122,20 +123,23 @@ export default function Home() {
       <main className="flex flex-1 flex-col items-center justify-center">
 
         <div className='relative w-[756] h-945 flex justify-center'>
-          <Image
+          <Image // muestra la imagen principal
             src={imgSrc}
             alt="Imagen recibida por websocket"
             width={756} // Especifica el ancho deseado
             height={945} // Especifica la altura deseada
             style={{ objectFit: 'cover' }} // Esto asegura que la imagen se escale correctamente
           />
-            {(showEyeArea & !isTimerOn) ? <div className="absolute inset-0 flex justify-center">
-              <div className="absolute top-1/4 bg-black bg-opacity-50 w-[300px] h-[300px] rounded-lg items-center">
-              {/*<h1 className="mb-4 text-center">Zona para ojos</h1>*/}
+            {// muestra el recuadro donde hay que poner los ojos
+            (showEyeArea & !isTimerOn) ? <div className="absolute inset-0 flex justify-center">
+              
+              <div className="absolute top-1/4 bg-white bg-opacity-40 w-[300px] h-[300px] rounded-lg items-center justify-center">
+              {/*<h1 className="mb-4 text-[50px] tex-black opacity-50">Zona para ojos</h1>*/}
               </div>
             </div> : <></>}
 
             { showQRcode ?
+              // 
               <div className="p-6 bg-white rounded-xl fixed left-50 bottom-10">
                 <QRCode
                     size={200}
@@ -147,6 +151,7 @@ export default function Home() {
             }
 
         {isTimerOn  ? 
+        //muestra el contador de tiempo antes de tomar la foto
         <div className='absolute justify-center bottom-40'>
           <Timer secondsToWait={time_before_foto} setIsVisible={() => {
               setIsTimerOn(false)
@@ -155,13 +160,14 @@ export default function Home() {
               setTimeout(() => {
                 setIsFlash(false)
               }, "200");
+
               setTimeout(() => {
-                setIsGeneratingAI(true)
-                
+                setIsGeneratingAI(true)   
               }, "300");
 
             }}/> </div>: <></>}
           
+          {/* muestra el div blanco que simula el flash*/}
           <Transition
             show={isFlash}
             enter="transition-opacity duration-0"
@@ -175,7 +181,8 @@ export default function Home() {
           </Transition>
         
 
-        {isGeneratingAI ? 
+        {isGeneratingAI ?
+          //muestra la barra de progreso 
           <div className="absolute p-1 text-2xl font-bold w-3/4 fixed bottom-40 opacity-70 text-white">
             <h1 className="mb-4 text-center">Generando imagen {progress}%</h1>
             <div className="flex w-full rounded-full  border-white border-2 p-1">
@@ -187,11 +194,6 @@ export default function Home() {
           </div> : <></>}
         
         </div>
-
-        
-
-
-
 
       </main>
 
