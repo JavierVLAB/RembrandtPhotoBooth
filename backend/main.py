@@ -19,9 +19,11 @@ time_to_see_qr_code = 5
 #cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
 cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
 
-debug = False
+debug = True
 ###########
 
+time_now = None
+formatted_date = None
 
 
 
@@ -66,8 +68,8 @@ def face_is_center(center, size, points):
             return False
     return True
 
-
-        
+take_picture_1 = False
+take_picture_2 = False        
 
 # Endpoint para iniciar la detección y el streaming
 @app.websocket("/ws")
@@ -90,7 +92,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
             if ret:
-                print(frame.shape)
+                #print(frame.shape)
                 # mirror  
                 frame = cv2.flip(frame, 1)
 
@@ -117,16 +119,24 @@ async def websocket_endpoint(websocket: WebSocket):
                     #print(frame.shape)
                     (frame_height, frame_width, _) = frame.shape
                     
-                    center = (frame_width/2, frame_height*0.35)
+                    center = (frame_width/2, frame_height*0.4)
                     size = int(frame_width*0.2)
                     colors = None
 
+
+
                     # Determine if the face is inside the circle
                     if face_is_center(center, size, [eyeL_center, eyeR_center]):
-                        
+
                         if counting_time:
                             
-                            if time.time() - start_time >= time_before_photo:
+                            elapse_time = time.time() - start_time 
+
+                            # if elapse_time > 1 and elapse_time < 2 and take_picture_1:
+                            #     cv2.imwrite('images/img{}01.jpg'.format(formatted_date), frame)
+                                
+
+                            if elapse_time >= time_before_photo:
                                 take_picture = True
                                 counting_time = False
        
@@ -135,6 +145,9 @@ async def websocket_endpoint(websocket: WebSocket):
                             await websocket.send_text("text_message:show counter")
                             counting_time = True
                             start_time = time.time()
+                            time_now = datetime.now()
+                            formatted_date = time_now.strftime('%Y%m%d%H%M%S')
+
             
                         colors = (0,255,0)
                     else:
@@ -157,7 +170,7 @@ async def websocket_endpoint(websocket: WebSocket):
                         
                         cv2.circle(frame, (int(center[0]),int(center[1])), size, colors , 1)
                         cv2.rectangle(frame, (int(center[0] - size),int(center[1] - size)), (int(center[0]+size),int(center[1]+size)), colors , 1)
-                        cv2.rectangle(frame, (0,0), (100,100), (50,50,50,50) , -1)
+                        
 
 
                     #img = prepare_image(frame)
@@ -167,14 +180,11 @@ async def websocket_endpoint(websocket: WebSocket):
 
                     if take_picture:
 
-                        time_now = datetime.now()
-                        formatted_date = time_now.strftime('%Y%m%d%H%M%S')
-
                         cv2.imwrite('images/img{}.jpg'.format(formatted_date), frame)
                         
                         time.sleep(0.1)
 
-                        jpg_as_text = await get_images(websocket, 'img{}'.format(formatted_date))        #37 is the node save image in the comfyui workflow
+                        jpg_as_text = await get_images(websocket, 'img{}'.format(formatted_date))        #53 is the node save image in the comfyui workflow
 
                         image_base64 = base64.b64encode(jpg_as_text).decode('utf-8')
 

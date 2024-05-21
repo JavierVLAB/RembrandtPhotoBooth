@@ -21,7 +21,7 @@ export const Timer = ({setIsVisible, secondsToWait}) => {
   }, [secs]);
 
   return (
-    <div className="justify-center fixed left-50 bottom-40 font-black text-9xl text-white text-opacity-60">
+    <div className="font-black text-[200px] text-white text-opacity-60">
       {secs}
     </div>
   );

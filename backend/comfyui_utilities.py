@@ -25,7 +25,7 @@ def get_history(prompt_id):
 
 async def get_images(wsnextjs, image_name = "test01"):
     
-    with open("dark-room-rembrandt.json", "r") as workflow_file:
+    with open("darkroom_v04.json", "r") as workflow_file:
         prompt = json.loads(workflow_file.read())
 
     prompt["20"]["inputs"]["image"] = image_name + '.jpg'

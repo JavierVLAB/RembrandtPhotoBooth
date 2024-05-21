@@ -92,6 +92,6 @@ Open the APP at [http://localhost:3000/prototipo](localhost:3000/prototipo)
 - ~~mostrar avance de generacion?~~
 - ~~mostrar conteo poner conteo cuando va~~
 - ~~mostrar flash poner flash cuando va~~
-- arreglar IA
+- ~~arreglar IA~~
 - automatizar cambio de camaras y decidir que camara usar
 - revisar porque despues de ver la nueva imagen se pone primero la foto anterior y luego empieza de nuevo el streaming

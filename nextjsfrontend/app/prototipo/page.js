@@ -120,37 +120,34 @@ export default function Home() {
       </Head>
 
       <main className="flex flex-1 flex-col items-center justify-center">
-        {/*<img src={imgSrc} alt="Webcam Stream" 
-              style={isDetectingFace ? { width: "90%"} : { width: "40%"} } />*/}
 
-        <div className=''>
+        <div className='relative w-[756] h-945 flex justify-center'>
           <Image
             src={imgSrc}
             alt="Imagen recibida por websocket"
-            width={500} // Especifica el ancho deseado
-            height={800} // Especifica la altura deseada
+            width={756} // Especifica el ancho deseado
+            height={945} // Especifica la altura deseada
             style={{ objectFit: 'cover' }} // Esto asegura que la imagen se escale correctamente
           />
             {(showEyeArea & !isTimerOn) ? <div className="absolute inset-0 flex justify-center">
-              <div className="absolute top-1/4 bg-black bg-opacity-50 w-48 h-48 rounded-lg items-center">
+              <div className="absolute top-1/4 bg-black bg-opacity-50 w-[300px] h-[300px] rounded-lg items-center">
               {/*<h1 className="mb-4 text-center">Zona para ojos</h1>*/}
               </div>
             </div> : <></>}
-        </div>
 
-        
-        { showQRcode ?
-          <div className="p-6 bg-white rounded-xl fixed left-50 bottom-10">
-            <QRCode
-                size={200}
-                style={{ height: "auto", maxWidth: "100%", width: "100%" }}
-                value={imageURL}
-                viewBox={`0 0 200 200`}
-                /> 
-          </div> : <></>
-        }
+            { showQRcode ?
+              <div className="p-6 bg-white rounded-xl fixed left-50 bottom-10">
+                <QRCode
+                    size={200}
+                    style={{ height: "auto", maxWidth: "100%", width: "100%" }}
+                    value={imageURL}
+                    viewBox={`0 0 200 200`}
+                    /> 
+              </div> : <></>
+            }
 
         {isTimerOn  ? 
+        <div className='absolute justify-center bottom-40'>
           <Timer secondsToWait={time_before_foto} setIsVisible={() => {
               setIsTimerOn(false)
               setIsFlash(true)
@@ -163,7 +160,7 @@ export default function Home() {
                 
               }, "300");
 
-            }}/> : <></>}
+            }}/> </div>: <></>}
           
           <Transition
             show={isFlash}
@@ -178,15 +175,23 @@ export default function Home() {
           </Transition>
         
 
-        {isGeneratingAI ? <div className="p-1 text-2xl font-bold w-1/2 fixed left-50 bottom-20 opacity-70">
-          <h1 className="mb-4 text-center">Generando imagen {progress}%</h1>
-          <div className="flex w-full rounded-full  border-white border-2 p-1">
-            <div
-              className="h-6 bg-gray-600 rounded-full dark:bg-gray-100"
-              style={{ width: `${progress}%` }}
-            ></div>
-          </div>
-        </div> : <></>}
+        {isGeneratingAI ? 
+          <div className="absolute p-1 text-2xl font-bold w-3/4 fixed bottom-40 opacity-70 text-white">
+            <h1 className="mb-4 text-center">Generando imagen {progress}%</h1>
+            <div className="flex w-full rounded-full  border-white border-2 p-1">
+              <div
+                className="h-6 bg-gray-600 rounded-full dark:bg-gray-100"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          </div> : <></>}
+        
+        </div>
+
+        
+
+
+
 
       </main>
 
