@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react";
 
-export const Timer = ({setIsVisible, secondsToWait}) => {
+export const Timer = ({setIsVisible, secondsToWait, shootflash}) => {
 
   const [secs, setSecs] = useState(secondsToWait);
 
@@ -14,6 +14,7 @@ export const Timer = ({setIsVisible, secondsToWait}) => {
 
       if(s==0) {
         setIsVisible()
+        shootflash()
       }
     }, 1000);
 

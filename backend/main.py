@@ -80,6 +80,7 @@ async def websocket_endpoint(websocket: WebSocket):
     start_time = 0
     counting_time = False
     take_picture = False
+    first_time = True
 
     try:
         camera = cv2.VideoCapture(0) 
@@ -87,6 +88,9 @@ async def websocket_endpoint(websocket: WebSocket):
         # Aseguramos que la camara este a 1920x1080 
         camera.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
+
+        # Crear el objeto de balance de blancos
+        whitebalance_obj = cv2.xphoto.createGrayworldWB()
         
         while True:
 
@@ -103,6 +107,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 #rotate only the rotated camera
                 if cam["portrait"]: frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
                     
+                frame = whitebalance_obj.balanceWhite(frame)
+
                 # detectamos las personas    
                 results = model(frame, verbose=False)
                 
@@ -198,10 +204,10 @@ async def websocket_endpoint(websocket: WebSocket):
                         time.sleep(0.1)
 
                         # Enviamos la imagen a firebase
-                        image_out_url = None #upload_image_to_firebase('images_out/img{}_out.png'.format(formatted_date),'imagenes/img{}_out.png'.format(formatted_date))
+                        image_out_url = None#upload_image_to_firebase('images_out/img{}_out.png'.format(formatted_date),'imagenes/img{}_out.png'.format(formatted_date))
                         
                         # Preparamos la imagen para enviarla a Nextjs
-                        send_img = cv2.imread('images_out/img{}out.png'.format(formatted_date))
+                        send_img = cv2.imread('images_out/img{}_out.png'.format(formatted_date))
                         _, buffer = cv2.imencode('.jpg', send_img)
                         jpg_as_text = base64.b64encode(buffer).decode()
 
@@ -211,18 +217,20 @@ async def websocket_endpoint(websocket: WebSocket):
                         await websocket.send_text("text_message:image_url:{}".format(image_out_url))
                         await asyncio.sleep(time_to_see_qr_code)
                     
+
+
                     # Preparamos la imagen normal para enviarla a Nextjs
                     _, buffer = cv2.imencode('.jpg', img)
                     jpg_as_text = base64.b64encode(buffer).decode()
                     
                     await websocket.send_text(jpg_as_text)
                     await asyncio.sleep(0.05) 
+                    
 
                 else:
                     # Si no se detecta a nadie, mandamos el texto de no detection
                     await websocket.send_text("text_message:No people detected") 
-                    await asyncio.sleep(5)
-
+                    await asyncio.sleep(1)
                 
             else:
                 break
@@ -240,4 +248,4 @@ async def shutdown_event():
     pass
 
 
-
+"7169582976:AAEc6fJdbIwoKslT5tpOA6Qp9FvDsGcQUDM"

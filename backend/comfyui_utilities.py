@@ -77,7 +77,7 @@ async def get_images(wsnextjs, image_name = "test01"):
 
 async def generate_image(wsnextjs, image_name = "test01"):
     
-    with open("darkroom_v04.json", "r") as workflow_file:
+    with open("workflows_comfyui/darkroom_v06.json", "r") as workflow_file:
         prompt = json.loads(workflow_file.read())
 
     prompt["20"]["inputs"]["image"] = image_name + '.jpg'
