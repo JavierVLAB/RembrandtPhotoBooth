@@ -10,20 +10,22 @@ import './style.css'
 export default function Home() {
     const staticImageSrc = '/Rembrandt.jpg';
     const [imgSrc, setImageSrc] = useState(staticImageSrc)
+    const [imgPngSrc, setImagePngSrc] = useState('/img.png')
     const websocketRef = useRef(null);
     //const [isDetectingFace, setIsDetectingFace] = useState(false)
     //const [showQRcode, setShowQRcode] = useState(false)
+    //const [isGeneratingAI, setIsGeneratingAI] = useState(false)
+    //const [firstTime, setFirstTime] = useState(true)
+    //const [showEyeArea, setShowEyeArea] = useState(false)
+    //const [isTimerOn, setIsTimerOn] = useState(false)
     const [imageURL, setImageURL] = useState("")
-    const [isTimerOn, setIsTimerOn] = useState(false)
     const [isFlash, setIsFlash] = useState(false)
     const [progress, setProgress] = useState(0)
-    //const [isGeneratingAI, setIsGeneratingAI] = useState(false)
+
     const [msgCount, setMsgCount] = useState(0)
-    const [showEyeArea, setShowEyeArea] = useState(false)
 
     const [selectedDiv, setSelectedDiv] = useState('')
-    const [firstTime, setFirstTime] = useState(true)
-
+    
     const time_before_foto = 3
     
     const handleWebSocketMessages = useCallback((event) => {
@@ -41,6 +43,7 @@ export default function Home() {
           // Cuando no se detecta a nadie
           setImageSrc(staticImageSrc);
           setSelectedDiv('')
+          setImagePngSrc('/img.png')
 
 
         } else if (text_message.startsWith('image')) {
@@ -50,32 +53,39 @@ export default function Home() {
           setImageURL(image_url)
 
           setSelectedDiv('showQRCode')
+          setImagePngSrc('/img_3.png')
         
         } else if (text_message === 'show counter') {
           // Cuando la persona esta colocada correctamente
           //y se empieza a contar antes de la fot
 
           setSelectedDiv('showTimer')
+          setImagePngSrc('/img_2.png')
+        
+        } else if (text_message === 'hide QR') {
+          // Cuando la persona esta colocada correctamente
+          //y se empieza a contar antes de la fot
+
+          setSelectedDiv('')
 
         } else if (text_message === 'hide counter') {
           // cuando la persona se sale de la posicion correcta
           
           setSelectedDiv('showfaceArea')
+          setImagePngSrc('/img_4.png')
 
         } else if (text_message.startsWith('progress')) {
           //cuando comfyui esta generando la imagen
           const new_progress = Math.round(Number(text_message.slice(9))*100)
           setProgress(new_progress)
           setSelectedDiv('showProgress')
+          setImagePngSrc('/img_5.png')
         }
 
       } else {
           //cuando se recibe una imagen
           const src = `data:image/jpeg;base64,${message}`;
           setImageSrc(src);
-
-
-          
 
       }
     }, [])   
@@ -93,7 +103,6 @@ export default function Home() {
 
       websocket.onerror = (error) => {
         console.log("WebSocket error:", error);
-        
       };
 
       websocket.onclose = () => {
@@ -110,7 +119,9 @@ export default function Home() {
 
     const renderContent = () => {
       //console.log(selectedDiv)
+      
       switch (selectedDiv) {
+      //switch ('showQRCode') {
         case 'showfaceArea':
           return (
             <div className="absolute inset-0 flex justify-center">
@@ -123,31 +134,34 @@ export default function Home() {
         case 'showTimer':
           return (
             <div className='absolute justify-center bottom-40'>
-              <Timer secondsToWait={time_before_foto} 
+              <Timer secondsToWait={time_before_foto} size={'200px'}
                   shootflash={() =>
                     setSelectedDiv('showFlash')
                   }
                   setIsVisible={() => {
-                    setIsTimerOn(false)
+
                     setIsFlash(true)
-                    setShowEyeArea(false)
+                    setImagePngSrc('/img.png')
                     setTimeout(() => {
                       setIsFlash(false)
                   }, "200");
-
-
                 }}/> </div>
           )
 
         case 'showQRCode':
           return (
-            <div className=" shadow-2xl p-6 bg-white rounded-xl fixed left-50 top-[1280px]">
-              <QRCode
+            <div className='fixed left-50 top-[1280px] text-center'>
+              <div className=" shadow-2xl p-6 bg-white rounded-xl  ">
+                <QRCode
                   size={200}
                   style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                   value={imageURL}
                   viewBox={`0 0 200 200`}
-                  /> 
+                /> 
+              </div>
+
+              <Timer secondsToWait={20} className="justify-center" size={'120px'}
+                      setIsVisible={()=>{}} shootflash={() => {}}/> 
             </div>
           )
 
@@ -197,6 +211,7 @@ export default function Home() {
       <main className="flex flex-1 flex-col items-center justify-center">
 
         <div className='relative w-[756] h-945 flex justify-center'>
+        
           <Image // muestra la imagen principal
             src={imgSrc}
             priority={true}
@@ -204,6 +219,17 @@ export default function Home() {
             width={756} // Especifica el ancho deseado
             height={945} // Especifica la altura deseada
             style={{ objectFit: 'cover' }} // Esto asegura que la imagen se escale correctamente
+            className=''
+          />
+
+          <Image // muestra la imagen principal
+            src={imgPngSrc}
+            priority={true}
+            alt="Imagen recibida por websocket"
+            width={756} // Especifica el ancho deseado
+            height={945} // Especifica la altura deseada
+            style={{ objectFit: 'cover' }} // Esto asegura que la imagen se escale correctamente
+            className='absolute'
           />
 
           {renderContent()}

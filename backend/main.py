@@ -151,7 +151,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
                             # Definition of the name of the file (month day, hour and minute)
                             time_now = datetime.now()
-                            formatted_date = time_now.strftime('%m%d%H%M')
+                            formatted_date = time_now.strftime('%m%d%H%M%S')
 
             
                         colors = (0,255,0)
@@ -163,6 +163,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
                         counting_time = False
                         colors = (0,0,255)
+                        
 
                     # Show the area for the eyes and the point in the body (nose and eyes)
                     if debug:
@@ -216,8 +217,15 @@ async def websocket_endpoint(websocket: WebSocket):
 
                         await websocket.send_text("text_message:image_url:{}".format(image_out_url))
                         await asyncio.sleep(time_to_see_qr_code)
-                    
 
+                        await websocket.send_text("text_message:hide QR")
+
+                        first_time = True
+                        
+                    
+                    if first_time:
+                        await websocket.send_text("text_message:hide counter")
+                        await asyncio.sleep(0.05)
 
                     # Preparamos la imagen normal para enviarla a Nextjs
                     _, buffer = cv2.imencode('.jpg', img)
@@ -225,12 +233,15 @@ async def websocket_endpoint(websocket: WebSocket):
                     
                     await websocket.send_text(jpg_as_text)
                     await asyncio.sleep(0.05) 
+
+                    first_time = False
                     
 
                 else:
                     # Si no se detecta a nadie, mandamos el texto de no detection
                     await websocket.send_text("text_message:No people detected") 
                     await asyncio.sleep(1)
+                    first_time = True
                 
             else:
                 break
@@ -246,6 +257,3 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.on_event("shutdown")
 async def shutdown_event():
     pass
-
-
-"7169582976:AAEc6fJdbIwoKslT5tpOA6Qp9FvDsGcQUDM"

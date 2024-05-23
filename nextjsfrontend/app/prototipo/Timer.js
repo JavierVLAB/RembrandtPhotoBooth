@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react";
 
-export const Timer = ({setIsVisible, secondsToWait, shootflash}) => {
+export const Timer = ({setIsVisible, secondsToWait, shootflash, size}) => {
 
   const [secs, setSecs] = useState(secondsToWait);
 
@@ -22,7 +22,7 @@ export const Timer = ({setIsVisible, secondsToWait, shootflash}) => {
   }, [secs]);
 
   return (
-    <div className="font-black text-[200px] text-white text-opacity-60">
+    <div className={`font-black text-white text-opacity-60`} style={{fontSize: size}}>
       {secs}
     </div>
   );
