@@ -1,6 +1,6 @@
 ::Clean local Images
-del C:\Users\User\RembrandtPhotoBooth\backend\images\img*
-del C:\Users\User\RembrandtPhotoBooth\backend\images_out\img*
+::del C:\Users\User\RembrandtPhotoBooth\backend\images\img*
+del C:\Users\User\RembrandtPhotoBooth\backend\images_out\img*.png
 
 ::Clean Cloud Images
 cd C:\Users\User\RembrandtPhotoBooth\backend

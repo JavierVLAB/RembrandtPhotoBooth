@@ -250,7 +250,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 else:
                     # Si no se detecta a nadie, mandamos el texto de no detection
                     await websocket.send_text("text_message:No people detected") 
-                    await asyncio.sleep(2)
+                    await asyncio.sleep(1)
                     first_time = True
                 
             else:
@@ -259,6 +259,12 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         camera.release()
         #await websocket.close()
+
+    except cv2.error:
+        camera.release
+        await websocket.send_text("text_message:reload")
+        await asyncio.sleep(0.1)
+
     
     finally:
         camera.release()

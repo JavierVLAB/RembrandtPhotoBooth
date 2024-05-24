@@ -3,7 +3,7 @@ import cv2
 def insert_logos(background_image_path, output_image_path):
     # Rutas de las imágenes
 
-    overlay_image_path = 'test_scripts/img_2.png'
+    overlay_image_path = 'test_scripts/logos.png'
 
 
     # Leer las imágenes

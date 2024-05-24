@@ -6,13 +6,18 @@ import QRCode from "react-qr-code";
 import { Timer } from "./Timer.js"
 import { Transition } from '@headlessui/react'
 import './style.css'
-import toast, { Toaster } from 'react-hot-toast';
 
 export default function Home() {
     const staticImageSrc = '/Rembrandt.jpg';
     const [imgSrc, setImageSrc] = useState(staticImageSrc)
     const [imgPngSrc, setImagePngSrc] = useState('/img.png')
     const websocketRef = useRef(null);
+    //const [isDetectingFace, setIsDetectingFace] = useState(false)
+    //const [showQRcode, setShowQRcode] = useState(false)
+    //const [isGeneratingAI, setIsGeneratingAI] = useState(false)
+    //const [firstTime, setFirstTime] = useState(true)
+    //const [showEyeArea, setShowEyeArea] = useState(false)
+    //const [isTimerOn, setIsTimerOn] = useState(false)
     const [imageURL, setImageURL] = useState("")
     const [isFlash, setIsFlash] = useState(false)
     const [progress, setProgress] = useState(0)
@@ -21,16 +26,10 @@ export default function Home() {
 
     const [selectedDiv, setSelectedDiv] = useState('')
 
-    const [background_img, setBackground] = useState('Fondo_DC_01.jpg')
-
-    const [firstConnection, setFirstConnection] = useState(false)
+    const [background, setBackground] = useState('background1')
     
     const time_before_foto = 5
     const time_QR_code = 20
-
-    const bg_img_url_style = {
-      backgroundImage: `url(/${background_img})`
-    } 
     
     const handleWebSocketMessages = useCallback((event) => {
       // funcion que maneja los mensajes recibidos por websocket
@@ -47,8 +46,8 @@ export default function Home() {
           // Cuando no se detecta a nadie
           setImageSrc(staticImageSrc);
           setSelectedDiv('')
-
-          setBackground('Fondo_DC_01.jpg')
+          setImagePngSrc('/img.png')
+          setBackground('background1')
 
 
         } else if (text_message.startsWith('image')) {
@@ -58,16 +57,14 @@ export default function Home() {
           setImageURL(image_url)
 
           setSelectedDiv('showQRCode')
-          setBackground('Fondo_DC_04.jpg')
-
+          setImagePngSrc('/img_3.png')
         
         } else if (text_message === 'show counter') {
           // Cuando la persona esta colocada correctamente
           //y se empieza a contar antes de la fot
 
           setSelectedDiv('showTimer')
-          //setBackground('Fondo_DC_01.jpg')
-
+          setImagePngSrc('/img_2.png')
         
         } else if (text_message === 'hide QR') {
           // Cuando la persona esta colocada correctamente
@@ -75,37 +72,30 @@ export default function Home() {
 
           setSelectedDiv('')
 
-
         } else if (text_message === 'hide counter') {
           // cuando la persona se sale de la posicion correcta
           
           setSelectedDiv('showfaceArea')
-
+          setImagePngSrc('/img_4.png')
 
         } else if (text_message === 'show wait screen') {
           // cuando la persona se sale de la posicion correcta
-          setBackground('Fondo_DC_03.jpg')
-
+          
+          setImagePngSrc('/img_2.png')
 
         } else if (text_message.startsWith('progress')) {
           //cuando comfyui esta generando la imagen
           const new_progress = Math.round(Number(text_message.slice(9))*100)
           setProgress(new_progress)
           setSelectedDiv('showProgress')
-
-        } else if (text_message.startsWith('reload')) {
-          //cuando comfyui esta generando la imagen
-          setTimeout(()=> {
-            window.location.reload()
-          },500)
-
+          setImagePngSrc('/img_5.png')
         }
 
       } else {
           //cuando se recibe una imagen
           const src = `data:image/jpeg;base64,${message}`;
           setImageSrc(src);
-          setBackground('Fondo_DC_02.jpg')
+          setBackground('background2')
       }
     }, [])   
 
@@ -118,8 +108,6 @@ export default function Home() {
       
       websocket.onopen = () => {
           console.log("WebSocket connection established.");
-          toast.success('Server ready!')
-          setFirstConnection(true)
       };
 
       websocket.onerror = (error) => {
@@ -128,9 +116,6 @@ export default function Home() {
 
       websocket.onclose = () => {
           console.log("WebSocket connection closed.");
-          if (firstConnection) {
-            window.location.reload()
-          }
       }; 
 
       websocket.onmessage = handleWebSocketMessages
@@ -147,12 +132,12 @@ export default function Home() {
       //console.log(selectedDiv)
       
       switch (selectedDiv) {
-      //switch ('showfaceArea') {
+      //switch ('showQRCode') {
         case 'showfaceArea':
           return (
             <div className="absolute inset-0 flex justify-center">
-              <div className="absolute top-1/4  w-[400px] h-[400px] rounded-lg items-center justify-center">
-                <img className="text-white bg-opacity-40" src="/face-area.svg"></img>
+              <div className="absolute top-1/4 bg-white bg-opacity-40 w-[300px] h-[300px] rounded-lg items-center justify-center">
+              {/*<h1 className="mb-4 text-[50px] tex-black opacity-50">Zona para ojos</h1>*/}
               </div>
             </div>
           )
@@ -176,7 +161,7 @@ export default function Home() {
 
         case 'showQRCode':
           return (
-            <div className='fixed left-50 top-[1280px] text-center'>
+            <div className='fixed left-50 top-[1400px] text-center'>
               <div className=" shadow-2xl p-6 bg-white rounded-xl  ">
                 <QRCode
                   size={200}
@@ -229,23 +214,13 @@ export default function Home() {
 
 
   return (
-    <div className='flex min-h-screen flex-col items-center justify-center background' style={bg_img_url_style}>
+    <div className={`flex min-h-screen flex-col items-center justify-center ${background}`}>
       <Head>
         <title>Dark Chamber Rembrandt</title>
       </Head>
 
       <main className="flex flex-1 flex-col items-center justify-center">
-       { /*
-        <Image // muestra la imagen principal
-            src={'/bg01.jpg'}
-            priority={true}
-            alt="Imagen de fondo"
-            width={1200} // Especifica el ancho deseado
-            height={1920} // Especifica la altura deseada
-            //style={{ objectFit: 'cover' }} // Esto asegura que la imagen se escale correctamente
-            className='fixed'
-          />
-        */}
+
         <div className='relative w-[756px] h-auto flex justify-center'>
         
           <Image // muestra la imagen principal
@@ -258,11 +233,19 @@ export default function Home() {
             className=''
           />
 
+          <Image // muestra la imagen principal
+            src={imgPngSrc}
+            priority={true}
+            alt="Imagen recibida por websocket"
+            width={756} // Especifica el ancho deseado
+            height={945} // Especifica la altura deseada
+            style={{ objectFit: 'cover' }} // Esto asegura que la imagen se escale correctamente
+            className='absolute'
+          />
+
           {renderContent()}
         
         </div>
-
-        <div><Toaster position="top-center" /></div>
 
       </main>
 

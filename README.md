@@ -103,3 +103,4 @@ Open the APP at [http://localhost:3000/prototipo](localhost:3000/prototipo)
 - Escribir una explicacion de como funciona, y un FAQ
 - ~~borrar imagenes local~~
 - ~~borrar imagenes nube ~~
+- Crear un backup de imagenes de la gente y de los resultados
