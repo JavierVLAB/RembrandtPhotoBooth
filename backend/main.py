@@ -22,7 +22,7 @@ cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
 
 debug = False
 
-send_firebae = False
+send_firebase = True
 
 ###########
 
@@ -214,7 +214,7 @@ async def websocket_endpoint(websocket: WebSocket):
 
                         # Enviamos la imagen a firebase
                         image_out_url = None
-                        if send_firebae:
+                        if send_firebase:
                             image_out_url = upload_image_to_firebase('images_out/img{}_out.jpg'.format(formatted_date),'imagenes/RembrandtDarkRoom{}.jpg'.format(formatted_date))
                         
                         # Preparamos la imagen para enviarla a Nextjs
