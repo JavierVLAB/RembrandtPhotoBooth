@@ -3,7 +3,7 @@ import cv2
 def insert_logos(background_image_path, output_image_path):
     # Rutas de las imágenes
 
-    overlay_image_path = 'img_2.png'
+    overlay_image_path = 'test_scripts/img_2.png'
 
 
     # Leer las imágenes
@@ -34,6 +34,7 @@ def insert_logos(background_image_path, output_image_path):
 
     # Guardar la imagen resultante
     cv2.imwrite(output_image_path, background_image)
+    cv2.imwrite(output_image_path,[int(cv2.IMWRITE_JPEG_QUALITY),100])
     #print(f"Imagen guardada en {output_image_path}")
 
 
@@ -54,4 +55,4 @@ def mix_with_png(background_image, overlay_image_path):
     return background_image
 
 if __name__ == "__main__":
-    insert_logos('test_scripts/imagen_1.png', 'images_out/combined_image.png')
+    insert_logos('test_scripts/imagen_1.png', 'images_out/combined_image.jpg')

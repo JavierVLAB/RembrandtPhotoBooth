@@ -26,7 +26,8 @@ export default function Home() {
 
     const [selectedDiv, setSelectedDiv] = useState('')
     
-    const time_before_foto = 3
+    const time_before_foto = 5
+    const time_QR_code = 20
     
     const handleWebSocketMessages = useCallback((event) => {
       // funcion que maneja los mensajes recibidos por websocket
@@ -74,6 +75,11 @@ export default function Home() {
           setSelectedDiv('showfaceArea')
           setImagePngSrc('/img_4.png')
 
+        } else if (text_message === 'show wait screen') {
+          // cuando la persona se sale de la posicion correcta
+          
+          setImagePngSrc('/img_2.png')
+
         } else if (text_message.startsWith('progress')) {
           //cuando comfyui esta generando la imagen
           const new_progress = Math.round(Number(text_message.slice(9))*100)
@@ -112,7 +118,9 @@ export default function Home() {
       websocket.onmessage = handleWebSocketMessages
 
       return () => {
-        websocketRef.current.close();
+        if (websocketRef.current) {
+          websocketRef.current.close();
+        }
       };
 
     }, [handleWebSocketMessages]);
@@ -150,7 +158,7 @@ export default function Home() {
 
         case 'showQRCode':
           return (
-            <div className='fixed left-50 top-[1280px] text-center'>
+            <div className='fixed left-50 top-[1400px] text-center'>
               <div className=" shadow-2xl p-6 bg-white rounded-xl  ">
                 <QRCode
                   size={200}
@@ -160,7 +168,7 @@ export default function Home() {
                 /> 
               </div>
 
-              <Timer secondsToWait={20} className="justify-center" size={'120px'}
+              <Timer secondsToWait={time_QR_code} className="justify-center" size={'120px'}
                       setIsVisible={()=>{}} shootflash={() => {}}/> 
             </div>
           )
