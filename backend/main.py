@@ -10,7 +10,7 @@ from comfyui_utilities import generate_image
 from upload_image_FS import upload_image_to_firebase
 from datetime import datetime
 from insertpngopenCV import insert_logos
-
+import os
 
 ########### Configuration
 
@@ -45,6 +45,28 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# funcion para saber la ip del ordenador
+def get_local_ip():
+    if os.name == "nt":  # Windows
+        command = "ipconfig"
+    else:  # Unix-based systems
+        command = "ifconfig"
+    
+    result = os.popen(command).read()
+    
+    if os.name == "nt":  # Parse Windows ipconfig output
+        for line in result.split("\n"):
+            if "IPv4 Address" in line:
+                return line.split(":")[1].strip()
+    else:  # Parse Unix-based ifconfig output
+        for line in result.split("\n"):
+            if "inet " in line and "127.0.0.1" not in line:
+                return line.split(" ")[1]
+    return "127.0.0.1"
+
+print("La IP local es: " + get_local_ip())
 
 # Modelo para detectar la persona, esto da los puntos de la cara
 model = YOLO("models/yolov8n-pose.pt") 
@@ -259,16 +281,48 @@ async def websocket_endpoint(websocket: WebSocket):
     except WebSocketDisconnect:
         camera.release()
         #await websocket.close()
+        print("1 La IP local es: " + get_local_ip())
 
     except cv2.error:
-        camera.release
+        camera.release()
         await websocket.send_text("text_message:reload")
         await asyncio.sleep(0.1)
+        await websocket.close()
 
-    
     finally:
         camera.release()
+        print("La IP local es: " + get_local_ip())
         #await websocket.close()
+
+
+def abrir_darkroom_app ():
+    bat_file_path = r"C:\Users\User\RembrandtPhotoBooth\init\init_darkroom_app.bat"
+    os.system(f'start {bat_file_path}')
+
+# Endpoint para cerrar Chrome
+@app.get("/recarga-app")
+async def recarga_app():
+    os.system("taskkill /im chrome.exe /f")
+    time.sleep(2)
+    abrir_darkroom_app()
+    return {"message": "Chrome closed"}
+
+# Endpoint para abrir un programa específico
+@app.get("/abrir-app/")
+async def abrir_app():
+    abrir_darkroom_app()
+    return {"message": "Abriendo Dark room"}
+
+# Reinicio del ordenador
+@app.get("/reinicio/")
+async def reinicio():
+    os.system("shutdown /r /t 5")
+    return {"message": "Reiniciando"}
+
+@app.get("/show-ip/")
+async def show_ip():
+    local_ip = "la ip local es: " + get_local_ip()
+    return {"message": local_ip}
 
 @app.on_event("shutdown")
 async def shutdown_event():

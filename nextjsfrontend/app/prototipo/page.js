@@ -127,6 +127,12 @@ export default function Home() {
 
 
     useEffect(() => {
+      
+      // Queremos que se recague en 30 minutos
+      const timeout = setTimeout(() => {
+        window.location.reload();
+      }, 30 * 60 * 1000);
+
       //funciones para websocket
 
       const websocket = new WebSocket('ws://localhost:8000/ws');
@@ -152,6 +158,9 @@ export default function Home() {
       websocket.onmessage = handleWebSocketMessages
 
       return () => {
+
+        clearTimeout(timeout)
+
         if (websocketRef.current) {
           websocketRef.current.close();
         }
