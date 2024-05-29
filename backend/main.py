@@ -56,10 +56,14 @@ def get_local_ip():
     
     result = os.popen(command).read()
     
-    if os.name == "nt":  # Parse Windows ipconfig output
+    if os.name == "nt":  # Windows
+        command = "ipconfig"
+        result = os.popen(command).read()
         for line in result.split("\n"):
-            if "IPv4 Address" in line:
-                return line.split(":")[1].strip()
+            if "IPv4 Address" in line or "Dirección IPv4" in line:  # Español/English
+                ip_address = line.split(":")[1].strip()
+                if ip_address != '127.0.0.1':
+                    return ip_address
     else:  # Parse Unix-based ifconfig output
         for line in result.split("\n"):
             if "inet " in line and "127.0.0.1" not in line:
@@ -319,10 +323,21 @@ async def reinicio():
     os.system("shutdown /r /t 5")
     return {"message": "Reiniciando"}
 
+# Muestra la ip local
 @app.get("/show-ip/")
 async def show_ip():
     local_ip = "la ip local es: " + get_local_ip()
     return {"message": local_ip}
+
+# Apaga el ordenador
+@app.get("/apagar/")
+async def shutdown():
+    if os.name == "nt":  # Windows
+        os.system("shutdown /s /t 1")
+    else:  # Unix-based systems
+        os.system("shutdown now")
+    return {"message": "Apagando"}
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
