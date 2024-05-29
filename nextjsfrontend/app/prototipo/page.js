@@ -24,6 +24,8 @@ export default function Home() {
     const [background_img, setBackground] = useState('Fondo_DC_01.jpg')
 
     const [firstConnection, setFirstConnection] = useState(false)
+
+    const requestRef = useRef(null);
     
     const time_before_foto = 5
     const time_QR_code = 20
@@ -103,8 +105,22 @@ export default function Home() {
 
       } else {
           //cuando se recibe una imagen
-          const src = `data:image/jpeg;base64,${message}`;
-          setImageSrc(src);
+          // esta nueva version evita que se dispare la memoria
+          if (requestRef.current) {
+            cancelAnimationFrame(requestRef.current);
+          }
+  
+          // Schedule the image update for the next animation frame
+          requestRef.current = requestAnimationFrame(() => {
+            const message = event.data;
+            const src = `data:image/jpeg;base64,${message}`;
+            setImageSrc(src);
+  
+            // Clear the current animation frame request
+            requestRef.current = null;
+          });
+
+
           setBackground('Fondo_DC_02.jpg')
       }
     }, [])   
@@ -138,6 +154,9 @@ export default function Home() {
       return () => {
         if (websocketRef.current) {
           websocketRef.current.close();
+        }
+        if (requestRef.current) {
+          cancelAnimationFrame(requestRef.current);
         }
       };
 
