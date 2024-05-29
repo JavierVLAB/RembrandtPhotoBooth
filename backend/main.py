@@ -85,7 +85,7 @@ async def websocket_endpoint(websocket: WebSocket):
     take_picture = False
     first_time = True
 
-    time.sleep(20)
+    #time.sleep(20)
 
     try:
         camera = cv2.VideoCapture(0) 
