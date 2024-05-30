@@ -175,8 +175,8 @@ export default function Home() {
     const renderContent = () => {
       //console.log(selectedDiv)
       
-      //switch (selectedDiv) {
-      switch ('showQRCode') {
+      switch (selectedDiv) {
+      //switch ('showQRCode') {
         case 'showfaceArea':
           return (
             <div className="absolute inset-0 flex justify-center">
