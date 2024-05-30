@@ -205,7 +205,7 @@ export default function Home() {
 
         case 'showQRCode':
           return (
-            <div className='fixed left-50 top-[1340px] text-center'>
+            <div className='fixed left-50 top-[1440px] text-center'>
               <div className=" shadow-2xl pt-6 px-6 pb-3 bg-white rounded-xl  ">
                 <QRCode
                   size={200}
