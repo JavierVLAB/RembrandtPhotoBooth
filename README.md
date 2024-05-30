@@ -99,8 +99,8 @@ Open the APP at [http://localhost:3000/prototipo](localhost:3000/prototipo)
 - ~~ver porque no se ve el area al principio~~
 - ~~se queda pegado el QR~~
 - revisar errores a largo plazo
-- pensar en como usar Telegram si se quiere
-- Escribir una explicacion de como funciona, y un FAQ
+- ~~pensar en como usar Telegram si se quiere~~
+- ~~Escribir una explicacion de como funciona, y un FAQ~~
 - ~~borrar imagenes local~~
 - ~~borrar imagenes nube ~~
-- Crear un backup de imagenes de la gente y de los resultados
+- ~~Crear un backup de imagenes de la gente y de los resultados~~

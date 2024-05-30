@@ -130,6 +130,7 @@ export default function Home() {
       
       // Queremos que se recague en 30 minutos
       const timeout = setTimeout(() => {
+        console.log('Reiniciando')
         window.location.reload();
       }, 30 * 60 * 1000);
 
@@ -174,8 +175,8 @@ export default function Home() {
     const renderContent = () => {
       //console.log(selectedDiv)
       
-      switch (selectedDiv) {
-      //switch ('showfaceArea') {
+      //switch (selectedDiv) {
+      switch ('showQRCode') {
         case 'showfaceArea':
           return (
             <div className="absolute inset-0 flex justify-center">
@@ -204,17 +205,18 @@ export default function Home() {
 
         case 'showQRCode':
           return (
-            <div className='fixed left-50 top-[1280px] text-center'>
-              <div className=" shadow-2xl p-6 bg-white rounded-xl  ">
+            <div className='fixed left-50 top-[1340px] text-center'>
+              <div className=" shadow-2xl pt-6 px-6 pb-3 bg-white rounded-xl  ">
                 <QRCode
                   size={200}
                   style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                   value={imageURL}
                   viewBox={`0 0 200 200`}
                 /> 
+                <div className="font-bold text-black text-[40px]">#artvivant</div>
               </div>
 
-              <Timer secondsToWait={time_QR_code} className="justify-center" size={'120px'}
+              <Timer secondsToWait={time_QR_code} className="justify-center" size={'100px'}
                       setIsVisible={()=>{}} shootflash={() => {}}/> 
             </div>
           )
