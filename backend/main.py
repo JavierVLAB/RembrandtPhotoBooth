@@ -121,7 +121,7 @@ async def websocket_endpoint(websocket: WebSocket):
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
         # Crear el objeto de balance de blancos
-        whitebalance_obj = cv2.xphoto.createGrayworldWB()
+        whitebalance_obj = cv2.xphoto.createGrayworldWB() if not cam["portrait"] else None
         
         while True:
 
@@ -136,9 +136,9 @@ async def websocket_endpoint(websocket: WebSocket):
                 frame = frame[0:1080,285:1635] if cam['portrait'] else frame[ 0:720, 72:648]
                 
                 #rotate only the rotated camera
-                if cam["portrait"]: frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
-                    
-                frame = whitebalance_obj.balanceWhite(frame)
+                if cam["portrait"]: 
+                    frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
+                    frame = whitebalance_obj.balanceWhite(frame)
 
                 # detectamos las personas    
                 results = model(frame, verbose=False)
