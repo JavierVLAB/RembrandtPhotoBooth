@@ -17,12 +17,14 @@ import os
 time_before_photo = 5 #seconds
 time_to_see_qr_code = 20 #seconds 
 
-cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
-#cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
+#cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
+cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
 
 debug = False
 
 send_firebase = True
+
+confidence_threshold = 0.75 
 
 ###########
 
@@ -159,9 +161,10 @@ async def websocket_endpoint(websocket: WebSocket):
                     frame = cv2.rotate(frame, cv2.ROTATE_90_CLOCKWISE)
                     frame = whitebalance_obj.balanceWhite(frame)
 
-                # detectamos las personas    
-                results = model(frame, verbose=False)
-                
+                # detectamos las personas
+                  
+                results = model(frame, conf=confidence_threshold, verbose=False)
+                #print(results)
                 results_data = results[0].keypoints.data.numpy().shape[1]
                 
                 #If there is detection results_data > 0
@@ -265,9 +268,11 @@ async def websocket_endpoint(websocket: WebSocket):
                         # Preparamos la imagen para enviarla a Nextjs
                         send_img = cv2.imread('images_out/img{}_out.jpg'.format(formatted_date))
                         _, buffer = cv2.imencode('.jpg', send_img)
-                        jpg_as_text = base64.b64encode(buffer).decode()
-
-                        await websocket.send_text(jpg_as_text)
+                        # Envio en binario
+                        await websocket.send_bytes(buffer.tobytes())
+                        # #Envio como texto
+                        #jpg_as_text = base64.b64encode(buffer).decode()
+                        #await websocket.send_text(jpg_as_text)
                         await asyncio.sleep(0.1) 
 
                         await websocket.send_text("text_message:image_url:{}".format(image_out_url))
@@ -285,10 +290,15 @@ async def websocket_endpoint(websocket: WebSocket):
 
                         # Preparamos la imagen normal para enviarla a Nextjs
                         _, buffer = cv2.imencode('.jpg', img)
-                        jpg_as_text = base64.b64encode(buffer).decode()
+
+                        # Envio en binario
+                        await websocket.send_bytes(buffer.tobytes())
+                        
+                        # #Envio como texto
+                        #jpg_as_text = base64.b64encode(buffer).decode()
+                        #await websocket.send_text(jpg_as_text)
                         
                         await asyncio.sleep(0.05) 
-                        await websocket.send_text(jpg_as_text)
                         
                         first_time = False
                     
@@ -315,7 +325,7 @@ async def websocket_endpoint(websocket: WebSocket):
     finally:
         camera.release()
         print("La IP local es: " + get_local_ip())
-        await websocket.close()
+        #await websocket.close()
 
 
 

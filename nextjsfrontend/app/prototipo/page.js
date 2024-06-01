@@ -39,87 +39,78 @@ export default function Home() {
       const message = event.data
 
       setMsgCount(msgCount+1)
+
+      if (typeof message === 'string') {
       
-      if (message.startsWith('text_message')){
-        // Se recibe con todos los mensajes que no son una imagen
-        const text_message = message.slice(13)
-        //console.log(text_message)
+        if (message.startsWith('text_message')){
+          // Se recibe con todos los mensajes que no son una imagen
+          const text_message = message.slice(13)
+          //console.log(text_message)
 
-        if (text_message === 'No people detected') {
-          // Cuando no se detecta a nadie
-          setImageSrc(staticImageSrc);
-          setSelectedDiv('')
+          if (text_message === 'No people detected') {
+            // Cuando no se detecta a nadie
+            setImageSrc(staticImageSrc);
+            setSelectedDiv('')
 
-          setBackground('Fondo_DC_01.jpg')
-
-
-        } else if (text_message.startsWith('image')) {
-          //cuando se recibe el nombre de la imagen para generar el qrcode
-          const image_url = text_message.slice(10) 
-          //console.log(image_url)
-          setImageURL(image_url)
-
-          setSelectedDiv('showQRCode')
-          setBackground('Fondo_DC_04.jpg')
-
-        
-        } else if (text_message === 'show counter') {
-          // Cuando la persona esta colocada correctamente
-          //y se empieza a contar antes de la fot
-
-          setSelectedDiv('showTimer')
-          //setBackground('Fondo_DC_01.jpg')
-
-        
-        } else if (text_message === 'hide QR') {
-          // Cuando la persona esta colocada correctamente
-          //y se empieza a contar antes de la fot
-
-          setSelectedDiv('')
+            setBackground('Fondo_DC_01.jpg')
 
 
-        } else if (text_message === 'hide counter') {
-          // cuando la persona se sale de la posicion correcta
+          } else if (text_message.startsWith('image')) {
+            //cuando se recibe el nombre de la imagen para generar el qrcode
+            const image_url = text_message.slice(10) 
+            //console.log(image_url)
+            setImageURL(image_url)
+
+            setSelectedDiv('showQRCode')
+            setBackground('Fondo_DC_04.jpg')
+
           
-          setSelectedDiv('showfaceArea')
+          } else if (text_message === 'show counter') {
+            // Cuando la persona esta colocada correctamente
+            //y se empieza a contar antes de la fot
+
+            setSelectedDiv('showTimer')
+            //setBackground('Fondo_DC_01.jpg')
+
+          
+          } else if (text_message === 'hide QR') {
+            // Cuando la persona esta colocada correctamente
+            //y se empieza a contar antes de la fot
+
+            setSelectedDiv('')
 
 
-        } else if (text_message === 'show wait screen') {
-          // cuando la persona se sale de la posicion correcta
-          setBackground('Fondo_DC_03.jpg')
+          } else if (text_message === 'hide counter') {
+            // cuando la persona se sale de la posicion correcta
+            
+            setSelectedDiv('showfaceArea')
 
 
-        } else if (text_message.startsWith('progress')) {
-          //cuando comfyui esta generando la imagen
-          const new_progress = Math.round(Number(text_message.slice(9))*100)
-          setProgress(new_progress)
-          setSelectedDiv('showProgress')
+          } else if (text_message === 'show wait screen') {
+            // cuando la persona se sale de la posicion correcta
+            setBackground('Fondo_DC_03.jpg')
 
-        } else if (text_message.startsWith('reload')) {
-          //cuando comfyui esta generando la imagen
-          setTimeout(()=> {
-            window.location.reload()
-          },500)
 
-        }
+          } else if (text_message.startsWith('progress')) {
+            //cuando comfyui esta generando la imagen
+            const new_progress = Math.round(Number(text_message.slice(9))*100)
+            setProgress(new_progress)
+            setSelectedDiv('showProgress')
 
-      } else {
-          //cuando se recibe una imagen
-          // esta nueva version evita que se dispare la memoria
-          if (requestRef.current) {
-            cancelAnimationFrame(requestRef.current);
+          } else if (text_message.startsWith('reload')) {
+            //cuando comfyui esta generando la imagen
+            setTimeout(()=> {
+              window.location.reload()
+            },500)
+
           }
-  
-          // Schedule the image update for the next animation frame
-          requestRef.current = requestAnimationFrame(() => {
-            const message = event.data;
-            const src = `data:image/jpeg;base64,${message}`;
-            setImageSrc(src);
-  
-            // Clear the current animation frame request
-            requestRef.current = null;
-          });
+        }
+      } else if (message instanceof ArrayBuffer){
+          //cuando se recibe una imagen
 
+            const blob = new Blob([event.data], { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
+            setImageSrc(url);
 
           setBackground('Fondo_DC_02.jpg')
       }
@@ -138,6 +129,7 @@ export default function Home() {
 
       const websocket = new WebSocket('ws://localhost:8000/ws');
       websocketRef.current = websocket;
+      websocket.binaryType = 'arraybuffer';
       
       websocket.onopen = () => {
           console.log("WebSocket connection established.");
@@ -278,7 +270,7 @@ export default function Home() {
         */}
         <div className='relative w-[756px] h-auto flex justify-center'>
         
-          <Image // muestra la imagen principal
+          {/*<Image // muestra la imagen principal
             src={imgSrc}
             priority={true}
             alt="Imagen recibida por websocket"
@@ -286,6 +278,16 @@ export default function Home() {
             height={945} // Especifica la altura deseada
             style={{ objectFit: 'cover' }} // Esto asegura que la imagen se escale correctamente
             className=''
+      />*/}
+
+          <img 
+            className="w-full"
+            src={imgSrc}
+            alt="Imagen de fondo" 
+            width="756" 
+            height="945" 
+            style={{ objectFit: 'cover' }}
+            class="fixed" 
           />
 
           {renderContent()}
