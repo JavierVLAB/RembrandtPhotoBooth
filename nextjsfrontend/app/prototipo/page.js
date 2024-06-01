@@ -205,7 +205,7 @@ export default function Home() {
                   value={imageURL}
                   viewBox={`0 0 200 200`}
                 /> 
-                <div className="font-bold text-black text-[40px]">#artvivant</div>
+                <div className="font-bold text-black text-[30px]">#Artvivant2024</div>
               </div>
 
               <Timer secondsToWait={time_QR_code} className="justify-center" size={'100px'}
