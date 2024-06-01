@@ -17,8 +17,8 @@ import os
 time_before_photo = 5 #seconds
 time_to_see_qr_code = 20 #seconds 
 
-#cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
-cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
+cam = {"name": "webMac", "portrait": False, "w": 1280, "h": 720}
+#cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
 
 debug = False
 
@@ -98,7 +98,20 @@ def face_is_center(center, size, points):
     for point in points:
         if point[0] > center[0] + size or point[0] < center[0] - size or point[1] > center[1] + size or point[1] < center[1] - size:  
             return False
-    return True      
+    return True   
+
+#############################
+
+def abrir_darkroom_app ():
+    bat_file_path = r"C:\Users\User\RembrandtPhotoBooth\init\init_darkroom_app.bat"
+    os.system(f'start {bat_file_path}')
+
+def recarga():
+    os.system("taskkill /im chrome.exe /f")
+    time.sleep(1)
+    abrir_darkroom_app() 
+
+####################################
 
 # Endpoint para iniciar la detección y el streaming
 @app.websocket("/ws")
@@ -113,6 +126,9 @@ async def websocket_endpoint(websocket: WebSocket):
 
     #time.sleep(20)
 
+    start_time_app = time.time()
+    
+
     try:
         camera = cv2.VideoCapture(0) 
 
@@ -121,9 +137,12 @@ async def websocket_endpoint(websocket: WebSocket):
         camera.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
         # Crear el objeto de balance de blancos
-        whitebalance_obj = cv2.xphoto.createGrayworldWB() if not cam["portrait"] else None
+        whitebalance_obj = cv2.xphoto.createGrayworldWB() if cam["name"] == "javiCam" else None
         
         while True:
+
+            if time.time() - start_time_app > 25*60:
+                recarga()
 
             ret, frame = camera.read()   
 
@@ -296,19 +315,14 @@ async def websocket_endpoint(websocket: WebSocket):
     finally:
         camera.release()
         print("La IP local es: " + get_local_ip())
-        #await websocket.close()
+        await websocket.close()
 
 
-def abrir_darkroom_app ():
-    bat_file_path = r"C:\Users\User\RembrandtPhotoBooth\init\init_darkroom_app.bat"
-    os.system(f'start {bat_file_path}')
 
 # Endpoint para cerrar Chrome
 @app.get("/recarga-app")
 async def recarga_app():
-    os.system("taskkill /im chrome.exe /f")
-    time.sleep(2)
-    abrir_darkroom_app()
+    recarga()
     return {"message": "Chrome closed"}
 
 # Endpoint para abrir un programa específico
