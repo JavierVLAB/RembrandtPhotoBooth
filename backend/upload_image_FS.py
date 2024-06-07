@@ -23,8 +23,8 @@ def upload_image_to_firebase(file_path, destination_blob_name):
     return blob.public_url
 
 if __name__ == "__main__":
-    file_path = 'images/testJavi01.jpg'  #local image
-    destination_blob_name = 'imagenes/imagetest03.jpg'  #image path in the cloud storage
+    file_path = 'images/monalisa.png'  #local image
+    destination_blob_name = 'imagenes/testimage.png'  #image path in the cloud storage
     
     public_url = upload_image_to_firebase(file_path, destination_blob_name)
     print(f"Archivo subido a {public_url}")
