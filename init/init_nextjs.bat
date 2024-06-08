@@ -1,4 +1,5 @@
 @echo off
-cd C:\Users\User\RembrandtPhotoBooth\nextjsfrontend 
-npm run dev
+start /min cmd /k "cd /d C:\Users\User\RembrandtPhotoBooth\nextjsfrontend && npm run dev"
+::cd C:\Users\User\RembrandtPhotoBooth\nextjsfrontend 
+::npm run dev
 
