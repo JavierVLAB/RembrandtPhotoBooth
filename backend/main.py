@@ -22,7 +22,7 @@ cam = {"name": "javiCam", "portrait": True, "w": 1920, "h": 1080}
 
 debug = False
 
-send_firebase = True
+send_firebase = False
 
 confidence_threshold = 0.75 
 
