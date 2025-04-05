@@ -287,6 +287,7 @@ export default function Home() {
             width="756" 
             height="945" 
             style={{ objectFit: 'cover' }}
+            class="fixed"  // error corregir//
           />
 
           {renderContent()}

@@ -2,9 +2,9 @@
 import firebase_admin
 from firebase_admin import credentials, storage
 
-cred = credentials.Certificate('auth/iedcampus-firebase-adminsdk-fbsvc-48b145a483.json')
+cred = credentials.Certificate('auth/testapi-4ea72-firebase-adminsdk-thkcf-6e888c94f2.json')
 firebase_admin.initialize_app(cred, {
-    'storageBucket': 'iedcampus.firebasestorage.app'
+    'storageBucket': 'testapi-4ea72.appspot.com'
 })
 
 
@@ -24,7 +24,7 @@ def upload_image_to_firebase(file_path, destination_blob_name):
 
 if __name__ == "__main__":
     file_path = 'images/monalisa.png'  #local image
-    destination_blob_name = 'imagenes/image_test.png'  #image path in the cloud storage
+    destination_blob_name = 'imagenes/testimage.png'  #image path in the cloud storage
     
     public_url = upload_image_to_firebase(file_path, destination_blob_name)
     print(f"Archivo subido a {public_url}")
