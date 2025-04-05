@@ -281,7 +281,7 @@ export default function Home() {
       />*/}
 
           <img 
-            className="w-full fixed"
+            className="w-full"
             src={imgSrc}
             alt="Imagen de fondo" 
             width="756" 
