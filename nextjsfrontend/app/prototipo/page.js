@@ -281,13 +281,12 @@ export default function Home() {
       />*/}
 
           <img 
-            className="w-full"
+            className="w-full fixed"
             src={imgSrc}
             alt="Imagen de fondo" 
             width="756" 
             height="945" 
             style={{ objectFit: 'cover' }}
-            //class="fixed"  // error corregir//
           />
 
           {renderContent()}

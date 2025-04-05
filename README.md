@@ -78,29 +78,3 @@ Run ComfyUi indicating the image input dir and the image output dir
 # Usage
 
 Open the APP at [http://localhost:3000/prototipo](localhost:3000/prototipo)
-
-
-# TO-DO
-
-- ~~ajustar relacion de aspecto camaras~~
-- ~~ajustar balance de blanco~~
-- ~~como poner los logos~~ poner los logos, esta listo el proceso falta los logos
-- ~~mejorar lo del posicionamiento de la cara~~ poner quizas texto de posicionar ojos
-- ~~decidir si son los ojos, cara, o etc y arreglarlo~~  la zona esta con los ojos
-- ~~como hacer confirmación o simplemente~~
-- ~~revisar tiempos de espera ahora: 5 segundos para QR, 3 para toma de foto, 10 para generar IA ~~
-- ~~mostrar avance de generacion?~~
-- ~~mostrar conteo poner conteo cuando va~~
-- ~~mostrar flash poner flash cuando va~~
-- ~~arreglar IA~~
-- ~~automatizar cambio de camaras y decidir que camara usar~~
-- ~~revisar porque despues de ver la nueva imagen se pone primero la foto anterior y luego empieza de nuevo el streaming~~
-- ~~Resolver lo de fullscreen~~ ha sido muy complicado
-- ~~ver porque no se ve el area al principio~~
-- ~~se queda pegado el QR~~
-- revisar errores a largo plazo
-- ~~pensar en como usar Telegram si se quiere~~
-- ~~Escribir una explicacion de como funciona, y un FAQ~~
-- ~~borrar imagenes local~~
-- ~~borrar imagenes nube ~~
-- ~~Crear un backup de imagenes de la gente y de los resultados~~
