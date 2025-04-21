@@ -2,7 +2,7 @@
 import firebase_admin
 from firebase_admin import credentials, storage
 
-cred = credentials.Certificate('auth/iedcampus-firebase-adminsdk-fbsvc-48b145a483.json')
+cred = credentials.Certificate('auth/iedcampus-firebase-adminsdk-fbsvc-82ead3d7a0.json')
 firebase_admin.initialize_app(cred, {
     'storageBucket': 'iedcampus.firebasestorage.app'
 })
